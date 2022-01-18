@@ -190,7 +190,7 @@ the estimated matrix of coefficients.
 ### Plotting marginal effects
 
 Replace the values of the covariates (except the constitutive terms)
-with their means and compute the marginal effects.
+with their means and compute the marginal effects of polarization.
 
     use temp,clear
     foreach var of varlist seatshare incompatibility asymmetry {
@@ -342,7 +342,7 @@ Now we push this information into Mata and apply the `me_wt()` function:
       Z=(1 threshold), replace
     mata: dame=me_wt(coef, X, Z, group_id, wt)
 
-Compute the marginal effects at means:
+Compute the marginal effects of polarization at means:
 
     collapse (mean) polarization seatshare incompatibility asymmetry [fw=wt]
     expand 21
@@ -572,8 +572,8 @@ We use the unique values of `closing` to bin the observations:
          X=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
 
 As before, with the first differences method, we need to add an
-increment to the main explanatory variable, push this dataset to Mata,
-and apply the appropriate function.
+increment to the main explanatory variable (`neweduc`), push this
+dataset to Mata, and apply the appropriate function.
 
     preserve
     replace neweduc = neweduc+1
@@ -585,7 +585,7 @@ and apply the appropriate function.
 
     mata: dame=me_wt(coef, X, X1, group_id, wt)
 
-Compute the marginal effects at means:
+Compute the marginal effects of education at its mean:
 
     use temp,clear
     qui sum closing
@@ -762,14 +762,12 @@ and the matrix of coefficients.
 
 ### Plotting marginal effects
 
-Replace the values of the covariates (except the constitutive terms)
-with their means and compute the marginal effects. Replace `seniorit`,
-`spendgap_lag`, `spendgap`, and `distpart_lag` with their means, and
-`qualchal`, `qualchal_lag`, and `Retirement` with their modes, and make
-sure that the vote type variables single out the modal type of the vote
-(in this case, this means `Amend=1` and all other dummy variables
-representing this type set to zero). We then collapse the dataset and
-push it to Mata.
+Replace `seniorit`, `spendgap_lag`, `spendgap`, and `distpart_lag` with
+their means, and `qualchal`, `qualchal_lag`, and `Retirement` with their
+modes, and make sure that the vote type variables single out the modal
+type of the vote (in this case, this means `Amend=1` and all other dummy
+variables representing this type set to zero). We then collapse the
+dataset and push it to Mata.
 
     foreach x of varlist qualchal qualchal_lag Retirement {
     qui sum `x'
@@ -809,8 +807,9 @@ push it to Mata.
         distpart_lag RegPass Susp OtherPass Amend ProPart 1), replace
 
 To apply the first differencing method to computing the marginal effect
-of education, add the increment of 1 to `neweduc`. We then push the new
-dataset to Mata and apply the `me_byrow()` function.
+of the number of days to the next election, add the increment of 1 to
+`neweduc`. We then push the new dataset to Mata and apply the
+`me_byrow()` function.
 
     preserve 
     replace daystoelection = daystoelection+1
@@ -914,7 +913,8 @@ dataset to Mata, and apply the appropriate function.
 
     mata: dame=me_wt(coef, X, X1, group_id, wt)
 
-Compute the marginal effects at means:
+Compute the marginal effect of the proximity of the next election at its
+mean:
 
     use temp,clear
     qui sum dvprop
@@ -972,6 +972,7 @@ plot:
        (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
        yline(0, lcolor(red)) ytitle("DAME/MEM of Days to Election") ///
        xtitle("Democratic Vote Share") legend(off)
+    graph export ajlw-dame.svg,replace
 
 ![](doc-files/Stata-fig/ajlw-dame.svg)
 
@@ -1156,8 +1157,9 @@ matrix of the covariate values and the matrix of coefficients.
 ### Plotting marginal effects
 
 Replace the values of the covariates (except the constitutive terms)
-with their means and compute the marginal effects. We also would like to
-bin the values of logged flows to avoid overplotting later on.
+with their means and compute the marginal effect of logged FDI flows
+(`l_l_flows`). We also would like to bin the values of logged flows to
+avoid overplotting later on.
 
     use temp,clear
     foreach y of global varlist {
@@ -1254,7 +1256,7 @@ Now we push this information into Mata and apply the `me_wt()` function:
             l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop time 1) Z=(1 l_polity2) , replace
     mata: dame=me_wt(coef, X, Z, group_id, wt)
 
-Compute the marginal effects at means:
+Compute the marginal effect of `l_l_flows` at its mean:
 
     use temp, replace
     qui sum l_polity2
