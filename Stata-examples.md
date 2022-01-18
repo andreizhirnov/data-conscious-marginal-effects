@@ -70,13 +70,6 @@ term, which can be estimated using Stata’s default `xtprobit` command:
     xtprobit pec polarization threshold polarization_threshold seatshare seatshare_2 incompatibility ///
           asymmetry asym_seat, re i(ident)
 
-    . clear . use G.dta,clear
-
-    . 
-    . xtprobit pec polarization threshold polarization_threshold seatshare seatshar
-    > e_2 incompatibility ///
-    >       asymmetry asym_seat, re i(ident)
-
     Fitting comparison model:
 
     Iteration 0:   log likelihood = -732.30803  
@@ -227,40 +220,49 @@ below, will correspond to the unplotted filled and hollow markers with
 the same size, equal to the size of the largest marker of either type.
 Additional observations 1 and 4 correspond to the unplotted filled and
 hollow markers with the same size, equal to the size of the smallest
-marker of either
-type.\`\``{stata g-cp} gen counter=_n qui sum counter loc extra1=`=r(max)‘+1
-loc extra2=`=r(max)'+2 loc extra3=`=r(max)’+3 loc
-extra4=`=r(max)'+4 set obs`extra4’
+marker of either type.
 
-qui sum obs replace significant=1 in `extra1'/`extra2’ replace
-significant=0 in `extra3'/`extra4’ replace
-obs=`=r(min)' in`extra1’/`extra4' replace obs=`=r(max)’ in
-`extra2'/`extra3’
+    gen counter=_n
+    qui sum counter
+    loc extra1=`=r(max)'+1
+    loc extra2=`=r(max)'+2
+    loc extra3=`=r(max)'+3
+    loc extra4=`=r(max)'+4
+    set obs `extra4'
 
-\*\* break the ME values into steps qui sum me\_est,detail loc
-locut=`r(min)' +(`r(max)‘-`r(min)')*1/4 loc medcut=`r(min)’+(`r(max)'-`r(min)’)\*2/4
-loc hicut=`r(min)' +(`r(max)‘-`r(min)')*3/4 loc minest =`r(min)’ loc
-maxest =\`r(max)’
+    qui sum obs
+    replace significant=1 in `extra1'/`extra2'
+    replace significant=0 in `extra3'/`extra4'
+    replace obs=`=r(min)' in `extra1'/`extra4'
+    replace obs=`=r(max)' in `extra2'/`extra3'
 
-local colr = “white*0.5 yellow*0.5 orange*0.5 red*0.5” /\* color ramp:
-from less intense to more intense colors \*/
+    ** break the ME values into steps
+    qui sum me_est,detail
+    loc locut=`r(min)' +(`r(max)'-`r(min)')*1/4
+    loc medcut=`r(min)'+(`r(max)'-`r(min)')*2/4
+    loc hicut=`r(min)' +(`r(max)'-`r(min)')*3/4
+    loc minest =`r(min)'
+    loc maxest =`r(max)'
 
-twoway (contour me\_est polarization threshold if me\_est!=., ///
-ccuts(`locut'`medcut’ `hicut') ccolors(`colr’)) /// (scatter
-polarization threshold \[fw=obs\] if significant==0, /// msymbol(oh)
-mlcolor(black%95) mlwidth(vthin) msize(*.25)) /// (scatter polarization
-threshold \[fw=obs\] if significant==1, /// msymbol(o) mfcolor(black%95)
-mlwidth(none) msize(*.25)), /// xtitle(Threshold) ytitle(Polarization)
-ztitle("“) /// zlabel(`minest'`locut’ `medcut'`hicut’ \`maxest’) ///
-legend(off) clegend(title(”Effect Size", /// size(medsmall) pos(12)
-justification(right)) width(5) height(25))
+    local colr = "white*0.5 yellow*0.5 orange*0.5 red*0.5"
+    /* color ramp: from less intense to more intense colors */
 
+    twoway (contour me_est polarization threshold if me_est!=., ///
+       ccuts(`locut' `medcut' `hicut') ccolors(`colr')) ///
+          (scatter polarization threshold [fw=obs] if significant==0, ///
+       msymbol(oh) mlcolor(black%95) mlwidth(vthin) msize(*.25)) /// 
+          (scatter polarization threshold [fw=obs] if significant==1, ///
+       msymbol(o) mfcolor(black%95) mlwidth(none) msize(*.25)), ///
+          xtitle(Threshold) ytitle(Polarization) ztitle("") ///
+       zlabel(`minest' `locut' `medcut' `hicut' `maxest') ///
+          legend(off)  clegend(title("Effect Size", ///
+       size(medsmall) pos(12) justification(right)) width(5) height(25)) 
 
-    ![](doc-files/Stata-fig/g-cp.png)
+![](doc-files/Stata-fig/g-cp.png)
 
-    To create a heatmap, we can use the `crule` option instead of `ccuts` for the `twoway contour`:
+To create a heatmap, we can use the `crule` option instead of `ccuts`
+for the `twoway contour`:
 
-    ```stata
     gen counter=_n
     qui sum counter
     loc extra1=`=r(max)'+1
@@ -388,12 +390,8 @@ interaction term of `closing` and `neweduc`.
     drop if newvote==-1
     probit newvote closing neweduc educ2 cloeduc cloeduc2 age age2 south gov
 
-    . clear . use N.dta,clear
-
-    . drop if newvote==-1
     (66,316 observations deleted)
 
-    . probit newvote closing neweduc educ2 cloeduc cloeduc2 age age2 south gov
 
     Iteration 0:   log likelihood = -63205.249  
     Iteration 1:   log likelihood = -55865.033  
@@ -552,7 +550,7 @@ anchor the scatter sizes.
        legend(off)  clegend(title("Effect Size", size(medsmall) pos(12) justification(right)) ///
          width(5) height(25)) 
 
-![](doc-files/Stata-fig/n-edu-cp.svg)
+![](doc-files/Stata-fig/n-edu-cp.png)
 
 ### Computing and plotting DAME
 
@@ -661,27 +659,14 @@ larger this share, the more competitive the district).
           Retirement seniorit qualchal_lag qualchal spendgap_lag spendgap distpart_lag RegPass Susp ///
       OtherPass Amend ProPart if PresencePartyUnity==1 & Republican==1 & FoxNews==1, cluster(dist2)
 
-    . clear . use AJLW.dta,clear
-
-    . gen dvprop=dv/100
     (2,080 missing values generated)
 
-    . gen daysdv=daystoelection*dvprop
     (2,080 missing values generated)
 
-    . gen days2dv=daystoelection2*dvprop
     (2,080 missing values generated)
 
-    . gen days3dv=daystoelection3*dvprop
     (2,080 missing values generated)
 
-    . 
-    . logit PartyVote daystoelection daystoelection2 daystoelection3 dvprop daysdv 
-    > days2dv days3dv ///
-    >       Retirement seniorit qualchal_lag qualchal spendgap_lag spendgap distpar
-    > t_lag RegPass Susp ///
-    >   OtherPass Amend ProPart if PresencePartyUnity==1 & Republican==1 & FoxNews=
-    > =1, cluster(dist2)
 
     Iteration 0:   log pseudolikelihood = -21866.053  
     Iteration 1:   log pseudolikelihood = -19635.905  
@@ -884,7 +869,7 @@ anchor the scatter sizes.
        legend(off)  clegend(title("Effect Size", ///
          size(medsmall) pos(12) justification(right)) width(5) height(25)) 
 
-![](doc-files/Stata-fig/ajlw-cp.svg)
+![](doc-files/Stata-fig/ajlw-cp.png)
 
 ### Computing and plotting DAME
 
@@ -987,7 +972,6 @@ plot:
        (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
        yline(0, lcolor(red)) ytitle("DAME/MEM of Days to Election") ///
        xtitle("Democratic Vote Share") legend(off)
-    graph export ajlw-dame.svg,replace
 
 ![](doc-files/Stata-fig/ajlw-dame.svg)
 
@@ -1019,31 +1003,18 @@ former.
     xtnbreg dispute l_l_flows l_polity2 l_demflows l_dispute open_penn l_gdp_pc_penn ///
          gdp_grth inflation_1 urban xratchg l_pop time, re 
 
-    . clear . use RT.dta,clear
-
-    . 
-    . tsset country year 
-
     Panel variable: country (strongly balanced)
      Time variable: year, 1979 to 2006
              Delta: 1 unit
 
-    . gen l_l_flows=L.l_flows
     (882 missing values generated)
 
-    . gen l_polity2=L.polity2
     (635 missing values generated)
 
-    . gen l_dispute=L.dispute
     (138 missing values generated)
 
-    . gen l_demflows=l_l_flows*l_polity2
     (1,074 missing values generated)
 
-    .  
-    . xtnbreg dispute l_l_flows l_polity2 l_demflows l_dispute open_penn l_gdp_pc_p
-    > enn ///
-    >      gdp_grth inflation_1 urban xratchg l_pop time, re 
 
     Fitting negative binomial (constant dispersion) model:
 
@@ -1264,7 +1235,7 @@ the marker sizes on the scatter plot.
 
     gr combine hx yx hy, hole(3) imargin(zero) scale(1.1) xsize(5.5) ysize(5.5)
 
-![](doc-files/Stata-fig/rt-hm.svg)
+![](doc-files/Stata-fig/rt-hm.png)
 
 ### Computing and plotting DAME
 
