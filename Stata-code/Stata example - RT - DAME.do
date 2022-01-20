@@ -1,15 +1,12 @@
 
-
-cd "C:/Users/az310/Dropbox/ME paper X/replication Stata vignette/data"
-
-*** building a plot with DAME and MEM for an analysis presented in
-*** Robertson, Graeme B., and Emmanuel Teitelbaum. 2011. "Foreign Direct Investment, Regime Type, and Labor Protest in Developing Countries." _American Journal of Political Science_ 55(3): 665–677.
-*** The datasets is a part of the published replication materials and can be downloaded from Emmanuel Teitelbaum's webpage
-*** https://home.gwu.edu/~ejt/pages/Data_files/Robertson%20Teitelbaum%202011.dta"
+*** A plot for the DAME and MEM estimates for the analysis presented in
+*** Robertson, Graeme B., and Emmanuel Teitelbaum. 2011. "Foreign Direct Investment, Regime Type, and Labor Protest in Developing Countries." American Journal of Political Science 55(3): 665–677.
+*** The dataset is part of the replication materials and can be downloaded from Emmanuel Teitelbaum's website: https://home.gwu.edu/~ejt/pages/Data_files/Robertson%20Teitelbaum%202011.dta"
 
 clear all
 
-* specify the function that returns a vector of marginal effects for a given matrix and a function
+* Specify the function that returns the partial derivative of the predicted values of the dependent variable; 
+* it uses a matrix of covariate values needed to compute the linear prediction of the model (x) and a matrix of covariate values needed to compute the linear component of the first derivative of the predicted value of the dependent variable (z).
 mata 
 real matrix me(coef, X, Z) {
 int_coef_names = ("l_l_flows","l_demflows") 	/* The coefficients used to compute the derivative of the linear prediction */
@@ -22,16 +19,18 @@ dydx=(coef[.,k]*Z'):*exp(coef*X') 				/* Replace exp() with the derivative of th
 return(dydx)
 }
 end
-* specify the function that returns a vector of marginal effects by row; this function uss me() internally
+
+* Specify the function that returns a vector of marginal effects by row; this function uses me() internally
 mata
 real matrix me_byrow(coef, X, Z) {
 dydx=me(coef, X, Z)
 means=mean(dydx)'
-ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'						        /* Confidence level can be changed here */
+ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'		 /* Confidence level can be changed here */
 return((means,ra))
 }
 end
-* specify the function that returns a vector of weighted average marginal effects; this function uss me() internally
+
+* Specify the function that returns a vector of weighted average marginal effects; this function uses me() internally
 mata
 real matrix me_wt(coef, X, Z, group_id, weight) {
 dydx=me(coef, X, Z)
@@ -45,13 +44,13 @@ for (i=1; i<=rows(groups); i++) {
 	}
 dydxw=dydx*wtm
 means=mean(dydxw)'
-ra=mm_quantile(dydxw, 1, (0.025 \ 0.975))'						        /* Confidence level can be changed here */
+ra=mm_quantile(dydxw, 1, (0.025 \ 0.975))'		/* Confidence level can be changed here */
 return((groups,obs,means,ra))
 }
 end
 
-** load the data and estimate the model
-use RT.dta,clear
+* Load the data and estimate the model
+use "Robertson Teitelbaum 2011.dta",clear
 
 tsset country year 
 gen l_l_flows=L.l_flows
@@ -65,7 +64,8 @@ matrix beta=e(b)[.,e(depvar) + ":"]
 matrix vcov=e(V)[e(depvar) + ":",e(depvar) + ":"]
 
 preserve
-* simulate coefficients
+
+* Simulate the coefficients
 drawnorm coef1-coef`=colsof(beta)', n(10000) means(beta) cov(vcov) clear
 putmata coef=(*), replace
 restore
@@ -79,7 +79,7 @@ egen midpoint=median(l_polity2),by(group_id)
 putmata wt=wt group_id=midpoint X=(l_l_flows l_polity2 l_demflows l_dispute open_penn l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop time 1) Z=(1 l_polity2) , replace
 mata: dame=me_wt(coef, X, Z, group_id, wt)
 
-* mean case
+** Marginal effects at means
 collapse (mean) l_dispute open_penn l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop time l_l_flows [fw=wt]
 expand 21
 gen l_polity2=`mn' + (_n-1)*(`mx'-`mn')/20
@@ -91,9 +91,10 @@ getmata (mem lbm ubm)=mem
 mata: group = dame[.,1]
 getmata (midpoint obs dame_est lb ub)=dame, force
 
-* plot
+* Plot the DAME and MEM estimates
+/* Note that the replication do file uses additional graphical parameters, which leads to different axis and legend labels from this minimal example. */
 twoway (line mem l_polity2, lpattern(solid)) ///
 (rline lbm ubm l_polity2, lpattern(dash)) ///
 (rspike lb ub midpoint) ///
 (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
-yline(0, lcolor(red)) ytitle("ME of ln(FDI flows)") xtitle("Polity score") legend(off)
+yline(0, lcolor(red)) ytitle("ME of ln(FDI flows)") xtitle("Polity 2") legend(off)

@@ -1,15 +1,13 @@
 
-
-cd "C:/Users/az310/Dropbox/ME paper X/replication Stata vignette/data"
-
-*** building a plot with DAME and MEM for an analysis presented in
-*** Golder, Sona. 2006. _The Logic of Pre-Electoral Coalition Formation._ Columbus: Ohio State University Press..
-*** The dataset is available at Matt Golder's webpage at
-*** http://mattgolder.com/files/interactions/interaction3.zip" (interaction3.dta)
+*** A plot for the DAME and MEM estimates for the analysis presented in
+*** Golder, Sona. 2006. The Logic of Pre-Electoral Coalition Formation. Columbus: Ohio State University Press.
+*** The dataset is available from Matt Golder's website at: http://mattgolder.com/files/interactions/interaction3.zip" (named "interaction3.dta")
 
 clear all
 
-* specify the function that returns a vector of marginal effects for a given matrix and a function
+* Specify the function that returns the partial derivative of the predicted values of the dependent variable; 
+* it uses a matrix of covariate values needed to compute the linear prediction of the model (x) and a matrix of covariate values needed to compute the linear component of the first derivative of the predicted value of the dependent variable (z).
+
 mata
 real matrix me(coef, x, z) {
 int_coef_names = ("polarization","polarization_threshold")				/* The coefficients used to compute the derivative of the linear prediction */
@@ -22,7 +20,8 @@ dydx = (coef[.,k]*z'):*normalden(coef*x') 								/* Replace normalden() with th
 return(dydx)
 }
 end
-* specify the function that returns a vector of marginal effects by row; this function uss me() internally
+
+* Specify the function that returns a vector of marginal effects by row; this function uses me() internally
 mata
 real matrix me_byrow(coef, X, Z) {
 dydx=me(coef, X, Z)
@@ -31,7 +30,8 @@ ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'						        /* Confidence level can b
 return((means,ra))
 }
 end
-* specify the function that returns a vector of weighted average marginal effects; this function uss me() internally
+
+* Specify the function that returns a vector of weighted average marginal effects; this function uses me() internally
 mata
 real matrix me_wt(coef, X, Z, group_id, weight) {
 dydx=me(coef, X, Z)
@@ -50,8 +50,8 @@ return((groups,obs,means,ra))
 }
 end
 
-** load the data and estimate the model
-use G.dta,clear
+* Load the data and estimate the model
+use "interaction3.dta",clear
 
 xtprobit pec polarization threshold polarization_threshold seatshare seatshare_2 incompatibility asymmetry asym_seat, re i(ident) 
 keep if e(sample)
@@ -59,7 +59,8 @@ matrix beta=e(b)[.,e(depvar) + ":"]
 matrix vcov=e(V)[e(depvar) + ":",e(depvar) + ":"]
 
 preserve
-* simulate coefficients
+
+* Simulate the coefficients
 drawnorm coef1-coef`=colsof(beta)', n(10000) means(beta) cov(vcov) clear
 putmata coef=(*), replace
 restore
@@ -73,7 +74,7 @@ egen midpoint=median(threshold),by(group_id)
 putmata wt=wt group_id=midpoint X=(polarization threshold polarization_threshold seatshare seatshare_2 incompatibility asymmetry asym_seat 1) Z=(1 threshold), replace
 mata: dame=me_wt(coef, X, Z, group_id, wt)
 
-* mean case
+** Marginal effects at means
 collapse (mean) polarization seatshare incompatibility asymmetry [fw=wt]
 expand 21
 gen threshold=`mn' + (_n-1)*(`mx'-`mn')/20
@@ -87,9 +88,11 @@ getmata (mem lbm ubm)=mem
 mata: group = dame[.,1]
 getmata (midpoint obs dame_est lb ub)=dame, force
 
-* plot
+* Plot the DAME and MEM estimates
+/* Note that the replication do file uses additional graphical parameters, which leads to different axis and legend labels from this minimal example. */
 twoway (line mem threshold, lpattern(solid)) ///
 (rline lbm ubm threshold, lpattern(dash)) ///
 (rspike lb ub midpoint) ///
 (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
-yline(0, lcolor(red)) ytitle("ME of polarization") xtitle("Effective Electoral Threshold") legend(off)
+yline(0, lcolor(red)) ytitle("ME of polarization") xtitle("Effective Electoral Threshold") legend(off) ylab(-.0006(.0021).0078)
+

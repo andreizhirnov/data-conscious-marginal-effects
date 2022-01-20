@@ -15,8 +15,8 @@ installed using its v1.0.0 release:
     install_github("andreizhirnov/DAME@v1.0.0") 
 
 `DAME` depends on `stats` (R Core Team 2021), `methods` (R Core Team
-2021), and `MASS` (Ripley 2021) for calculations, and `ggplot2` for
-plotting.
+2021), and `MASS` (Ripley 2021) for calculations, and `ggplot2` (Wickham
+et al. 2021) for plotting.
 
 In this document, we also refer to the `foreign` (R Core Team 2020) and
 `dataverse` (Kuriwaki et al. 2021) packages to download the
@@ -31,7 +31,7 @@ We will need four datasets, which are included in the replication
 materials of the studies we replicated. These datasets are publicly
 available, and in this section, we show how you can obtain them.
 
-### Pre-electoral coalition formation (dataset G)
+### Pre-electoral coalition formation (G)
 
 The dataset was created by Sona Golder and used in her book (Golder
 2006) on electoral alliances. It can be found on Matt Golder’s web-page
@@ -46,7 +46,7 @@ be used to download it using R:
     dataset <- read.dta(file.path(tmpdir,"interaction3.dta"))
     saveRDS(dataset, "G.rds")
 
-### Voter registration rules and turnout (dataset N)
+### Voter registration rules and turnout (N)
 
 The dataset was originally used by Nagler (1991). It was made public by
 William D. Berry, Jacqueline H. R. DeMeritt, and Justin Esarey as part
@@ -61,7 +61,7 @@ following script can be used to download it using R:
     dataset <- read.dta(file.path(tmpdir,"scobit.dta"))
     saveRDS(dataset, "N.rds")
 
-### News media and party discipline (dataset AJLW)
+### News media and party discipline (AJLW)
 
 The datasets is part of the published replication materials for
 Arceneaux et al. (2016) and can be downloaded either directly from the
@@ -77,7 +77,7 @@ or using the `dataverse` package:
                                      .f=  foreign::read.dta)
     saveRDS(dataset, "AJLW.rds")
 
-### Foreign direct investment and labor protest (dataset RT)
+### Foreign direct investment and labor protest (RT)
 
 The datasets is part of the published replication materials for
 Robertson and Teitelbaum (2011) and can be downloaded from Emmanuel
@@ -89,7 +89,7 @@ following script can be used to download it using R:
       read.dta("https://home.gwu.edu/~ejt/pages/Data_files/Robertson%20Teitelbaum%202011.dta")
     saveRDS(dataset,"RT.rds")
 
-# Pre-electoral coalition formation (dataset G)
+# Pre-electoral coalition formation (G)
 
 Golder (2006) looks into the determinants of the pre-electoral coalition
 formation. One of the hypotheses is that “party system polarization
@@ -190,11 +190,14 @@ document.
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-### Plotting marginal effects
+### Plotting marginal effects of polarization
 
 Making a contour-plot to illustrate marginal effects from a simple
 probit is straightforward with the `plot_me()` function provided that
-the model is estimated with a call to the `glm()` function.
+the model is estimated with a call to the `glm()` function. We need to
+specify the object with the model estimates (`m`), the name of the
+variable whose marginal effect we seek to estimate (`polarization`) and
+the conditioning variable (`threshold`).
 
     library(ggplot2)
     plot_me(model = m, x = "polarization", over = "threshold") +
@@ -253,10 +256,10 @@ simulations to produce standard errors by setting `mc=TRUE`:
 
 ![](doc-files/R-fig/g-hm3-1.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of polarization
 
-To compute the distribution-weighted average marginal effects, we can
-resort to the `dame()` function:
+To compute the distribution-weighted average marginal effects of
+`polarization`, we can resort to the `dame()` function:
 
     (d <- dame(model=m, x="polarization", over="threshold", nbins=10))
 
@@ -330,7 +333,7 @@ include them in the model formula:
 
 ![](doc-files/R-fig/g-dame4-1.png)
 
-# Voter registration rules and turnout (dataset N)
+# Voter registration rules and turnout (N)
 
 Nagler (1991) examines the interactive effect of education and the
 restrictiveness of electoral registration rules on turnout. The latter
@@ -344,7 +347,8 @@ hurt less educated individuals.
 ### Load the data and estimate the model
 
 This expectation is captured using a probit model including an
-interaction term of `closing` and `neweduc`.
+interaction term of `closing` and `neweduc`, as well as an intraction
+term of `closing` and `neweduc` squared.
 
     dt <- readRDS("N.rds")
     dt <- subset(dt, newvote %in% 0:1, select=c("state","newvote","closing","neweduc",
@@ -387,13 +391,13 @@ interaction term of `closing` and `neweduc`.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-### Plotting marginal effects
+### Plotting marginal effects of the registration closing date
 
 We can use the `plot_me()` function to draw a contour-plot for the
-marginal effects. Since `closing` can only take on integer values, it
-makes more sense here to use the first-difference method for calculating
-the marginal effect. Thus, we set `discrete=TRUE` and use 1-day
-increments.
+marginal effects of the registration closing date. Since `closing` can
+only take on integer values, it makes more sense here to use the
+first-difference method for calculating the marginal effect. Thus, we
+set `discrete=TRUE` and use 1-day increments.
 
     plot_me(model = m, x = "closing", over = "neweduc", discrete = TRUE, discrete_step = 1) +
       scale_fill_steps(low="red", high="yellow", n.breaks=4) +
@@ -437,6 +441,8 @@ modes instead of means:
 
 ![](doc-files/R-fig/n-cp-f-1.png)
 
+### Plotting marginal effects of education
+
 When computing the marginal effect of education, we might benefit from
 keeping the same orientation of axes as before. To do so, we can use the
 `coord_flip()` function from `ggplot2`.
@@ -448,11 +454,11 @@ keeping the same orientation of axes as before. To do so, we can use the
 
 ![](doc-files/R-fig/n-cp2-1.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of the registration closing date
 
 Turning to DAME, we can use a similar syntax as before and, since
 `neweduc` takes only 8 unique values, we can bin the observations by the
-unique values of this variable.
+unique values of this variable (`use_distinct_values=TRUE`).
 
     d <- dame(model=m, x="closing", over="neweduc", 
               discrete=TRUE, discrete_step=1, 
@@ -472,7 +478,10 @@ unique values of this variable.
 
 ![](doc-files/R-fig/n-dame-1.png)
 
-Plotting the DAME of education:
+### Computing and plotting DAME of education
+
+Change the `x`, `over`, and the values of the running variable to plot
+the DAME of education:
 
     d <- dame(model=m, x="neweduc", over="closing", 
               discrete=TRUE, discrete_step=1)
@@ -490,7 +499,7 @@ Plotting the DAME of education:
 
 ![](doc-files/R-fig/n-dame2-1.png)
 
-# News media and party discipline (dataset AJLW)
+# News media and party discipline (AJLW)
 
 Arceneaux et al. (2016) view Congressmen as facing a choice between
 voting with the party and more closely following the preferences of
@@ -596,7 +605,7 @@ cluster-robust variance-covariance matrix:
 
     vc <- sandwich::vcovCL(m, cluster= ~ dist2 )
 
-### Plotting marginal effects
+### Plotting marginal effects of election proximity
 
 We use the `plot_me()` function to make a heatmap for the marginal
 effects of election proximity.
@@ -634,7 +643,7 @@ To obtain a contour-plot with a divergent scale, replace
 
 ![](doc-files/R-fig/ajlw-bin-cp-1.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of election proximity
 
 Do not forget to specify the variance-covariance matrix when computing
 DAME and MEM:
@@ -655,7 +664,7 @@ DAME and MEM:
 
 ![](doc-files/R-fig/ajlw-dame-1.png)
 
-# Foreign direct investment and labor protest (dataset RT)
+# Foreign direct investment and labor protest (RT)
 
 Robertson and Teitelbaum (2011) study the response of the local labor to
 foreign direct investment. The article argues that FDI flows lead to
@@ -667,14 +676,14 @@ fewer democratic means for resolving such conflicts.
 Since the dependent variable is a count of protests, we use a negative
 binomial regression. The right-hand side of the model equation includes
 an interaction of political regime (Polity 2 score) and the natural log
-of FDI flow:s we expect the latter’s effect to be conditional on the
+of FDI flow: we expect the latter’s effect to be conditional on the
 values of the former.
 
     dt <- readRDS("RT.rds")
     current_vals <- dt[,c("isocode","year","dispute","open_penn","l_gdp_pc_penn","gdp_grth",
                           "inflation_1","urban","xratchg","l_pop","time")]
     lagged_vals <- within(dt, {
-      year <- year + 1
+      year <- year + 1L
       l_l_flows <- l_flows
       l_polity2 <- polity2
       l_dispute <- dispute 
@@ -778,7 +787,7 @@ model with the `glmmTMB()` function from the `glmmTMB` package.
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
-### Plotting marginal effects
+### Plotting marginal effects of logged FDI flows
 
 To plot the marginal effects from the negative binomial regression
 estimated using `glm.nb()`, we can use the standard syntax of
@@ -824,7 +833,7 @@ Stata’s estimates shown in the paper, which also leads to varied
 marginal effect estimates):
 
     mcut <- cut(dt$l_l_flows, breaks=seq(from=-11.22, to=11.22, by=2))
-    binned <- tapply(dt$l_l_flows, INDEX=mcut, FUN=mean) 
+    binned <- tapply(dt$l_l_flows, INDEX=mcut, FUN=mean, na.rm=TRUE) 
     dt2 <- within(dt, {
       l_l_flows <- binned[mcut] 
     })
@@ -836,6 +845,7 @@ marginal effect estimates):
             vcov=vc,
             link="log",
             x = "l_l_flows", over = "l_polity2", mc=TRUE)
+
     gt <- g + 
       scale_fill_gradient(low="yellow", high="red") +
       labs(x="Polity score", y="log(FDI flows)") + 
@@ -844,29 +854,29 @@ marginal effect estimates):
 
 ![](doc-files/R-fig/rt-hm3-1.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of logged FDI flows
 
-As earlier, we will include the group-specific, differential intercepts
+As earlier, we will include the group-specific components of intercepts
 as the offset.
 
     re <- ranef(m2)$cond$isocode
     dt$reff <- re[dt$isocode,"(Intercept)"]
 
     d <- dame(formula = dispute ~ l_l_flows*l_polity2 + l_dispute + open_penn + 
-                l_gdp_pc_penn + gdp_grth + inflation_1 + urban + xratchg + l_pop + time + 
-                offset(reff),
+                l_gdp_pc_penn + gdp_grth + inflation_1 + urban + xratchg + l_pop + 
+                time + offset(reff),
             data=dt,
             coefficients=coef,
             vcov=vc,
             link="log",
-            x="l_l_flows", over="l_polity2", nbins=4)
-    mem <- mem(formula = pdispute ~ l_l_flows*l_polity2 + l_dispute + open_penn + 
-                 l_gdp_pc_penn + gdp_grth + inflation_1 + urban + xratchg + l_pop + time + 
-                 offset(reff),
+            x="l_l_flows", over="l_polity2", nbins=4, mc=TRUE)
+    mem <- mem(formula = dispute ~ l_l_flows*l_polity2 + l_dispute + open_penn + 
+                 l_gdp_pc_penn + gdp_grth + inflation_1 + urban + xratchg + l_pop + 
+                 time + offset(reff),
             data=dt,
             coefficients=coef,
             vcov=vc,
-            link="log", x="l_l_flows", at=list("l_polity2"=seq(from=-10,to=10, by=1)))
+            link="log", x="l_l_flows", mc=TRUE, at=list("l_polity2"=seq(from=-10,to=10, by=1)))
 
     ggplot(data=d, aes(x=bin_id, y=est, ymin=lb, ymax=ub)) + 
       geom_point() + 
@@ -935,6 +945,11 @@ Robertson, Graeme B., and Emmanuel Teitelbaum. 2011. “Foreign Direct
 Investment, Regime Type, and Labor Protest in Developing Countries.”
 *American Journal of Political Science* 55 (3): 665–77.
 
+Wickham, Hadley, Winston Chang, Lionel Henry, Thomas Lin Pedersen,
+Kohske Takahashi, Claus Wilke, Kara Woo, Hiroaki Yutani, and Dewey
+Dunnington. 2021. *Ggplot2: Create Elegant Data Visualisations Using the
+Grammar of Graphics*. <https://CRAN.R-project.org/package=ggplot2>.
+
 Xie, Yihui. 2021. *Knitr: A General-Purpose Package for Dynamic Report
 Generation in r*. <https://yihui.org/knitr/>.
 
@@ -944,4 +959,4 @@ Matrix Estimators*. <https://sandwich.R-Forge.R-project.org/>.
 Zhirnov, Andrei, Mert Moral, and Evgeny Sedashov. 2022. “Taking
 Distributions Seriously: On the Interpretation of the Estimates of
 Interactive Nonlinear Models.” *Political Analysis (Conditional
-Acceptance*.
+Acceptance)*.

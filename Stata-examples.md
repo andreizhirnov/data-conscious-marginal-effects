@@ -2,29 +2,29 @@
 
 This document illustrates how to generate plots with
 distribution-weighted average marginal effects (DAME) and heatmaps and
-contour-plots for the marginal effects in Stata. We use the same
-examples as Zhirnov, Moral, and Sedashov (2022), but with a simpler
-Stata code. In addition to the standard Stata and Mata commands, you
-will need to install the `moremata` package (Jann 2005), which can be
-downloaded from `ssc`:
+contour plots for the marginal effects in Stata. We use the same
+examples as Zhirnov, Moral, and Sedashov (2022), but simpler Stata code.
+In addition to the standard Stata and Mata commands, you will need to
+install the `moremata` package (Jann 2005), which can be downloaded from
+`ssc`:
 
     ssc install moremata
 
 # Obtaining the datasets
 
-We will need four datasets, which are included in the replication
-materials of the studies we replicated. These datasets are publicly
-available, and in this section, we show how you can obtain them.
+We will need four datasets, which are part of the replication materials
+of the studies we replicate. These datasets are publicly available, and
+in this section, we show how you can obtain them.
 
-### Pre-electoral coalition formation (dataset G)
+### Pre-electoral coalition formation (G)
 
 The dataset was created by Sona Golder and used in her book (Golder
-2006) on electoral alliances. It can be found on Matt Golder’s web-page
+2006) on electoral alliances. It can be found on Matt Golder’s website
 at
 [http://mattgolder.com/files/interactions/interaction3.zip/](http://mattgolder.com/files/interactions/interaction3.zip)
 under the name “interaction3.dta.”
 
-### Voter registration rules and turnout (dataset N)
+### Voter registration rules and turnout (N)
 
 The dataset was originally used by Nagler (1991) and made public by
 William D. Berry, Jacqueline H. R. DeMeritt, and Justin Esarey as part
@@ -33,21 +33,21 @@ file can be downloaded from
 <https://jdemeritt.weebly.com/uploads/2/2/7/7/22771764/bde.zip>; it is
 named as “scobit.dta.”
 
-### News media and party discipline (dataset AJLW)
+### News media and party discipline (AJLW)
 
 The dataset is part of the published replication materials for Arceneaux
 et al. (2016) and can be downloaded from the Harvard Dataverse
 (<https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27597>).
 We use the original, Stata version of the “FoxNews\_Master.tab” file.
 
-### Foreign direct investment and labor protest (dataset RT)
+### Foreign direct investment and labor protest (RT)
 
 The dataset is part of the published replication materials for Robertson
 and Teitelbaum (2011) and can be downloaded from Emmanuel Teitelbaum’s
 website <https://home.gwu.edu/~ejt/pages/Data.html>, or directly from
 <https://home.gwu.edu/~ejt/pages/Data_files/Robertson%20Teitelbaum%202011.dta>.
 
-# Pre-electoral coalition formation (dataset G)
+# Pre-electoral coalition formation (G)
 
 Golder (2006) looks into the determinants of the pre-electoral coalition
 formation. One of the hypotheses is that “party system polarization
@@ -65,32 +65,32 @@ This analysis uses a random-effects probit model with an interaction
 term, which can be estimated using Stata’s default `xtprobit` command:
 
     clear all
-    use G.dta,clear
+    use interaction3.dta,clear
 
     xtprobit pec polarization threshold polarization_threshold seatshare seatshare_2 incompatibility ///
           asymmetry asym_seat, re i(ident)
 
     Fitting comparison model:
 
-    Iteration 0:   log likelihood = -732.30803  
-    Iteration 1:   log likelihood = -672.85707  
-    Iteration 2:   log likelihood = -670.71987  
-    Iteration 3:   log likelihood = -670.71526  
-    Iteration 4:   log likelihood = -670.71526  
+    Iteration 0:   log likelihood = -749.41197  
+    Iteration 1:   log likelihood = -683.54241  
+    Iteration 2:   log likelihood = -681.29839  
+    Iteration 3:   log likelihood =  -681.2926  
+    Iteration 4:   log likelihood =  -681.2926  
 
     Fitting full model:
 
-    rho =  0.0     log likelihood = -670.71526
-    rho =  0.1     log likelihood = -636.97065
-    rho =  0.2     log likelihood = -628.21992
-    rho =  0.3     log likelihood =  -627.8238
-    rho =  0.4     log likelihood = -631.18562
+    rho =  0.0     log likelihood =  -681.2926
+    rho =  0.1     log likelihood = -646.84249
+    rho =  0.2     log likelihood = -637.69168
+    rho =  0.3     log likelihood = -637.02544
+    rho =  0.4     log likelihood =  -640.3162
 
-    Iteration 0:   log likelihood = -627.64236  
-    Iteration 1:   log likelihood = -617.60165  
-    Iteration 2:   log likelihood = -616.58931  
-    Iteration 3:   log likelihood = -616.57753  
-    Iteration 4:   log likelihood = -616.57753  
+    Iteration 0:   log likelihood = -636.85364  
+    Iteration 1:   log likelihood = -626.69411  
+    Iteration 2:   log likelihood = -625.68214  
+    Iteration 3:   log likelihood = -625.67261  
+    Iteration 4:   log likelihood = -625.67261  (backed up)
 
     Random-effects probit regression                     Number of obs    =  3,495
     Group variable: ident                                Number of groups =    278
@@ -102,32 +102,31 @@ term, which can be estimated using Stata’s default `xtprobit` command:
 
     Integration method: mvaghermite                      Integration pts. =     12
 
-                                                         Wald chi2(8)     =  79.84
-    Log likelihood = -616.57753                          Prob > chi2      = 0.0000
+                                                         Wald chi2(8)     =  85.48
+    Log likelihood = -625.67261                          Prob > chi2      = 0.0000
 
     ------------------------------------------------------------------------------
              pec | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
     -------------+----------------------------------------------------------------
-    polarization |  -.0026918   .0054117    -0.50   0.619    -.0132986     .007915
-       threshold |   .0192055   .0107673     1.78   0.074    -.0018979     .040309
-    polarizati~d |   .0004857   .0002826     1.72   0.086    -.0000683    .0010396
-       seatshare |   .0506767     .01143     4.43   0.000     .0282742    .0730791
-     seatshare_2 |  -.0005542   .0001091    -5.08   0.000    -.0007681   -.0003404
-    incompatib~y |  -.0066837   .0025194    -2.65   0.008    -.0116217   -.0017457
-       asymmetry |  -.1004616     .30077    -0.33   0.738    -.6899601    .4890368
-       asym_seat |  -.0284938    .008886    -3.21   0.001      -.04591   -.0110777
-           _cons |  -2.394879   .3130523    -7.65   0.000     -3.00845   -1.781308
+    polarization |   -.003196   .0054598    -0.59   0.558    -.0138971    .0075051
+       threshold |   .0191695   .0108315     1.77   0.077    -.0020599    .0403989
+    polarizati~d |   .0005275   .0002845     1.85   0.064      -.00003    .0010851
+       seatshare |    .052641   .0114296     4.61   0.000     .0302394    .0750426
+     seatshare_2 |  -.0005782   .0001095    -5.28   0.000    -.0007928   -.0003636
+    incompatib~y |  -.0075775   .0025334    -2.99   0.003    -.0125428   -.0026122
+       asymmetry |  -.0710249   .2988559    -0.24   0.812    -.6567716    .5147218
+       asym_seat |  -.0301315   .0088792    -3.39   0.001    -.0475344   -.0127286
+           _cons |  -2.381516   .3134815    -7.60   0.000    -2.995928   -1.767103
     -------------+----------------------------------------------------------------
-        /lnsig2u |  -.5355294   .2460616                     -1.017801   -.0532575
+        /lnsig2u |  -.5068768     .24457                     -.9862252   -.0275283
     -------------+----------------------------------------------------------------
-         sigma_u |   .7650878   .0941294                      .6011561    .9737227
-             rho |   .3692282   .0573074                      .2654559    .4866888
+         sigma_u |   .7761276   .0949088                      .6107225    .9863301
+             rho |    .375926   .0573775                      .2716583    .4931184
     ------------------------------------------------------------------------------
-    LR test of rho=0: chibar2(01) = 108.28                 Prob >= chibar2 = 0.000
+    LR test of rho=0: chibar2(01) = 111.24                 Prob >= chibar2 = 0.000
 
 Before we can proceed to computing marginal effects, we need to trim the
-dataset in memory to keep only the used observations and save it as a
-file.
+dataset to keep only the used observations and save it as a file.
 
     keep if e(sample)
     save temp, replace
@@ -144,7 +143,13 @@ Stata’s matrix environment, Mata:
 We also need to define three Mata functions:
 
     mata
-    /* me() returns a vector of marginal effects for a given matrix */
+    /* me() returns the partial derivative of the predicted
+    values of the dependent variable; 
+     it uses a matrix of covariate values needed to compute 
+     the linear prediction of the model (x) and a matrix of
+     covariate values needed to compute the linear component 
+     of the first derivative of the predicted value of the 
+     dependent variable (z).*/
     real matrix me(coef, x, z) {
     int_coef_names = ("polarization","polarization_threshold")
     /* The coefficients used to compute the derivative of the linear prediction */
@@ -184,10 +189,10 @@ We also need to define three Mata functions:
     end
 
 The above-defined function `me()` will calculate the partial derivatives
-of the model prediction using the supplied matrix of the covariates and
-the estimated matrix of coefficients.
+of the predicted value of the dependent variable using the supplied
+matrix of the covariates and the simulated matrix of coefficients.
 
-### Plotting marginal effects
+### Plotting marginal effects of polarization
 
 Replace the values of the covariates (except the constitutive terms)
 with their means and compute the marginal effects of polarization.
@@ -195,7 +200,7 @@ with their means and compute the marginal effects of polarization.
     use temp,clear
     foreach var of varlist seatshare incompatibility asymmetry {
     qui sum `var'
-    replace `var'=`=r(mean)'
+    replace `var'=r(mean)
     }
 
     collapse (mean) seatshare incompatibility asymmetry (count) obs=seatshare, ///
@@ -214,13 +219,15 @@ with their means and compute the marginal effects of polarization.
 
     gen significant=(lb>0 & ub>0)|(lb<0 & ub<0)
 
-Now, create a contourplot. We might want to add extra observations to
-anchor the scatter sizes. Additional observations 2 and 3, as defined
-below, will correspond to the unplotted filled and hollow markers with
-the same size, equal to the size of the largest marker of either type.
-Additional observations 1 and 4 correspond to the unplotted filled and
-hollow markers with the same size, equal to the size of the smallest
-marker of either type.
+Now, use `twoway contourplot` to create a contour plot showing marginal
+effects of polarization (`me_est`) on two dimensions: one showing the
+values of `polarization` and another showing the values of `threshold`.
+We might want to add extra observations to anchor the scatter sizes.
+Additional observations 2 and 3, as defined below, will correspond to
+the unplotted filled and hollow markers of the same size, equal to the
+size of the largest marker of either type. Additional observations 1 and
+4 correspond to the unplotted filled and hollow markers of the size
+equal to that of the smallest marker of either type.
 
     gen counter=_n
     qui sum counter
@@ -260,10 +267,9 @@ marker of either type.
 
 ![](doc-files/Stata-fig/g-cp.png)
 
-To create a heatmap, we can use the `crule` option instead of `ccuts`
-for the `twoway contour`:
+To create a heatmap instead of a contour plot, we can use the `crule`
+option instead of `ccuts` in the `twoway contour` syntax:
 
-    gen counter=_n
     qui sum counter
     loc extra1=`=r(max)'+1
     loc extra2=`=r(max)'+2
@@ -278,15 +284,15 @@ for the `twoway contour`:
     replace obs=`=r(max)' in `extra2'/`extra3'
 
     * color ramp: from less intense to more intense colors
-    loc scolr="yellow*.25"
-    loc ecolr="red*.95"
+    loc scolr="yellow*.25" /* starting color */
+    loc ecolr="red*.95" /* color at the high end */
 
     * variable grid
     qui sum polarization [fw=obs] 
     loc x1max: disp %9.1f r(max)
     loc x1min: disp %9.1f r(min)
     loc s1=round((`x1max'-`x1min')/4, 0.1)
-    /* Number of ticks on the y axis can be changed here or changing the `ylab' option below */
+    /* Number of ticks on the y axis can be changed here or changing the "ylab" option below */
 
     qui sum threshold [fw=obs]
     loc x2max: disp %9.4f r(max)
@@ -303,37 +309,42 @@ for the `twoway contour`:
        ylab(`x1min'(`s1')`x1max', grid gmax labsize(medsmall)) ///
        xlab(`x2min'(`s2')`x2max', labsize(medsmall) grid gmax) /// 
        legend(off) clegend(title("Effect Size", size(medsmall) pos(12) justification(right)) ///
-       ring(0) width(5) height(25)) nodraw name(yx, replace)
+       ring(0) width(5) height(25)) name(yx, replace)
 
+    /* to add histograms */
     twoway histogram threshold [fw=obs], frac ysca(alt reverse) ///
        xtitle("Effective Electoral Threshold", size(medsmall)) ytitle("") ///
-       xlab(`x2min'(`s2')`x2max') ylab(#3) ///
+       xlab(`x2min'(`s2')`x2max')///
+       ylab(#4, nogrid labsize(medsmall))  ///
        fysize(20) fcolor(black%95) lwidth(vthin) lcolor(white%25) nodraw name(hy, replace) 
 
     twoway histogram polarization [fw=obs], frac xsca(alt reverse) ///
        horiz ytitle("Polarization", size(medsmall)) xtitle("") ///
-       ylab(`x1min'(`s1')`x1max') xlab(#3) ///
+       ylab(`x1min'(`s1')`x1max') ///
+       xlab(#4, nogrid labsize(medsmall)) ///
        fxsize(20) fcolor(black%95) lwidth(vthin) lcolor(white%25) nodraw name(hx, replace)
 
     gr combine hx yx hy, hole(3) imargin(zero) scale(1.1) xsize(5.5) ysize(5.5)
 
 ![](doc-files/Stata-fig/g-hm.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of polarization
 
 To compute the distribution-weighted average marginal effects, we first
 need to break the dataset into bins according to the values of the
-conditioning variable:
+conditioning variable (`threshold`). We use `xtile` to create a variable
+with 10 groups of observations of approximately equal size and find the
+middle value of that variable for plotting.
 
     use temp,clear
     gen wt=1
-    qui sum threshold
-    loc mn=r(min)
-    loc mx=r(max)
     xtile group_id = threshold, nq(10)
     egen midpoint=median(threshold),by(group_id)
 
-Now we push this information into Mata and apply the `me_wt()` function:
+Now we push this information to Mata and apply the `me_wt()` function.
+We supply a matrix of all values for all covariates as `X` and a matrix
+of the variables used in the linear component of the first derivative as
+`Z`.
 
     putmata wt=wt ///
       group_id=midpoint ///
@@ -342,9 +353,16 @@ Now we push this information into Mata and apply the `me_wt()` function:
       Z=(1 threshold), replace
     mata: dame=me_wt(coef, X, Z, group_id, wt)
 
-Compute the marginal effects of polarization at means:
+To compute the marginal effects of polarization at its mean, we create a
+new dataset with the conditioning variable (`threshold`) taking 21
+values spanning over its range and all other covariates set to their
+means:
 
-    collapse (mean) polarization seatshare incompatibility asymmetry [fw=wt]
+    use temp,clear
+    qui sum threshold
+    loc mn=r(min)
+    loc mx=r(max)
+    collapse (mean) polarization seatshare incompatibility asymmetry
     expand 21
     gen threshold=`mn' + (_n-1)*(`mx'-`mn')/20
     gen polarization_threshold=polarization*threshold
@@ -355,7 +373,8 @@ Compute the marginal effects of polarization at means:
                  incompatibility asymmetry asym_seat 1) Z=(1 threshold), replace
     mata: mem=me_byrow(coef, X, Z)
 
-Push DAME and MEM estimates from Mata into Stata memory and make a plot:
+Push DAME and MEM estimates from Mata into Stata’s active dataset and
+make a plot:
 
     getmata (mem lbm ubm)=mem
     getmata (midpoint obs dame_est lb ub)=dame, force
@@ -369,28 +388,31 @@ Push DAME and MEM estimates from Mata into Stata memory and make a plot:
 
 ![](doc-files/Stata-fig/g-dame.svg)
 
-# Voter registration rules and turnout (dataset N)
+# Voter registration rules and turnout (N)
 
-Nagler (1991) examines the interactive effect of education and
+Nagler (1991) examines the interactive effect of education and the
 restrictiveness of electoral registration rules on turnout. The latter
 is measured using the number of days before the election when the
-registration closes. This variable takes on the value of 0 when the
-voters are allowed to register on the election day, and 30 means that
-the registration closes 30 days before the election day. The main
-hypothesis is conditional: more restrictive registration rules primarily
-hurt less educated individuals.
+registration closes (`closing`). This variable takes on the value of 0
+when the voters are allowed to register on the election day, and 30
+means that the registration closes 30 days before the election day. The
+education is captured with an 8-category variable (`neweduc`), which is
+treated as a quantitative variable. The model also includes the squared
+value of `neweduc` (i.e., `educ2`). The main hypothesis is conditional:
+more restrictive registration rules primarily hurt less educated
+individuals.
 
 ### Load the data and estimate the model
 
 This expectation is captured using a probit model including the
-interaction term of `closing` and `neweduc`.
+interaction terms of `closing` and `neweduc`, and `closing` and `educ2`:
 
     clear all
-    use N.dta,clear
+    use scobit.dta,clear
     drop if newvote==-1
     probit newvote closing neweduc educ2 cloeduc cloeduc2 age age2 south gov
 
-    (66,316 observations deleted)
+    (0 observations deleted)
 
 
     Iteration 0:   log likelihood = -63205.249  
@@ -420,9 +442,8 @@ interaction term of `closing` and `neweduc`.
     ------------------------------------------------------------------------------
 
 As earlier, we need to trim the dataset in memory to keep only the used
-observations and save it as a new data file. Because we use the first
-differencing method here, we also need to simulate the distribution of
-coefficients and push it to Stata’s matrix environment Mata:
+observations and save it as a new data file. We also need to simulate
+the distribution of coefficients and push it to Mata:
 
     keep if e(sample)
     save temp, replace
@@ -442,16 +463,15 @@ To make calculations, we need to define three Mata functions:
     /* Replace normal() with the appropriate function as needed */
     return(dydx)
     }
-    return(dydx)
-    }
-    /* me_byrow() returns a vector of marginal effects by row; this function uses me() internally */
+    /* me_byrow() returns marginal effects by row along with the confidence intervals;
+       this function uses me() internally */
     real matrix me_byrow(coef, X, Z) {
     dydx=me(coef, X, Z)
     means=mean(dydx)'
-    ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'/* Confidence level can be changed here */
+    ra=mm_quantile(dydx, 1, (0.025 \ 0.975))' /* Confidence level can be changed here */
     return((means,ra))
     } 
-    /* me_wt() returns a vector of weighted average marginal effects; 
+    /* me_wt() returns weighted averages of marginal effects; 
        this function uses me() internally */
     real matrix me_wt(coef, X, Z, group_id, weight) {
     dydx=me(coef, X, Z)
@@ -477,11 +497,15 @@ matrix of the covariates with the increment added to the main variable
 of interest (for which we are computing the marginal effects), and the
 matrix of coefficient estimates.
 
-### Plotting marginal effects
+### Plotting marginal effects of the restrictiveness of electoral registration rules
 
 Replace `age` with its mean and `south` and `gov` with their modes,
-collapse the dataset, and push it to Mata.
+collapse the dataset, and push it to Mata. At this step, we also
+condense the dataset by collapsing the dataset in memory by the unique
+values of `closing` and `neweduc` while generating a variable with the
+number of observations that take those values (`obs`).
 
+    use temp,clear
     egen age1=mean(age)
     egen south1=mode(south)
     egen gov1=mode(gov)
@@ -495,14 +519,13 @@ collapse the dataset, and push it to Mata.
     putmata X=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
 
 To apply the first differencing method to compute the marginal effect of
-education, add the increment of 1 to `neweduc`. We then push the new
+education, add the increment of 1 to `closing`. We then push the new
 dataset to Mata and apply the `me_byrow()` function.
 
     preserve
-    replace neweduc = neweduc+1
-    replace educ2 = neweduc^2
+    replace closing = closing+1
     replace cloeduc = closing*neweduc
-    replace cloeduc2=closing*neweduc^2
+    replace cloeduc2 = closing*educ2
     putmata X1=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
     restore
 
@@ -511,8 +534,9 @@ dataset to Mata and apply the `me_byrow()` function.
 
     gen significant=(lb>0 & ub>0)|(lb<0 & ub<0)
 
-Now, create a contourplot. We might want to add extra observations to
-anchor the scatter sizes.
+Now, create a contour plot with the marginal effects of the registration
+rules. We might want to add extra observations to anchor the sizes of
+filled and hollow markers to the same largest and smallest values.
 
     gen counter=_n
     qui sum counter
@@ -536,23 +560,23 @@ anchor the scatter sizes.
     loc minest =`r(min)'
     loc maxest =`r(max)'
 
-    local colr = "white*0.5 yellow*0.5 orange*0.5 red*0.5"
-    * color ramp: from less intense to more intense colors
+    local colr = "red*.5 orange*.5 yellow*.5 white*.5" 
+    /* Color ramp from more intense to less intense colors */
 
-    twoway (contour me_est neweduc closing if me_est!=., ///
-          ccuts(`locut' `medcut' `hicut') ccolors(`colr')) ///
-       (scatter neweduc closing [fw=obs] if significant==0, ///
-          msymbol(oh) mlcolor(black%95) mlwidth(vthin) msize(*.25)) /// 
-       (scatter neweduc closing [fw=obs] if significant==1, ///
-          msymbol(o) mfcolor(black%95) mlwidth(none) msize(*.25)), ///
-       xtitle(Closing Date) ytitle(Education) ztitle("") ///
-       zlabel(`minest' `locut' `medcut' `hicut' `maxest') ///
-       legend(off)  clegend(title("Effect Size", size(medsmall) pos(12) justification(right)) ///
-         width(5) height(25)) 
+    twoway (contour me_est closing neweduc if me_est!=., ///
+            ccuts(`locut' `medcut' `hicut') ccolors(`colr')) ///
+        (scatter closing neweduc [fw=obs] if significant==0, ///
+           msymbol(oh) mlcolor(black%95) mlwidth(vthin) msize(*.25)) /// 
+    (scatter closing neweduc [fw=obs] if significant==1, ///
+       msymbol(o) mfcolor(black%95) mlwidth(none) msize(*.25)), ///
+      xtitle(Education) ytitle(Closing Date) ///
+      ztitle("") zlabel(`minest' `locut' `medcut' `hicut' `maxest') ///
+    legend(off)  clegend(title("Effect Size", size(medsmall) pos(12) ///
+      justification(right)) width(5) height(25)) 
 
-![](doc-files/Stata-fig/n-edu-cp.png)
+![](doc-files/Stata-fig/n-clo-cp.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of the restrictiveness of electoral registration rules
 
 To make calculations faster, we first condense the dataset. We keep only
 unique values of covariates and create a variable to store the number of
@@ -565,76 +589,82 @@ actual observations that have those values (`wt`).
     gen cloeduc=closing*neweduc
     gen cloeduc2=closing*neweduc^2
 
-Now we push this information into Mata and apply the `me_wt()` function.
-We use the unique values of `closing` to bin the observations:
+Now we push this information to Mata and apply the `me_wt()` function.
+We use the unique values of `neweduc` to bin the observations:
 
-    putmata wt=wt group_id=closing ///
+    putmata wt=wt group_id=neweduc ///
          X=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
 
 As before, with the first differences method, we need to add an
-increment to the main explanatory variable (`neweduc`), push this
-dataset to Mata, and apply the appropriate function.
+increment to the main explanatory variable (`closing`) and push this
+dataset to Mata. We apply `me_wt()` to compute the weighted averages of
+in-sample marginal effects with confidence intervals.
 
     preserve
-    replace neweduc = neweduc+1
-    replace educ2 = neweduc^2
+    replace closing = closing+1
     replace cloeduc = closing*neweduc
-    replace cloeduc2=closing*neweduc^2
+    replace cloeduc2 = closing*educ2
     putmata X1=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
     restore
 
     mata: dame=me_wt(coef, X, X1, group_id, wt)
 
-Compute the marginal effects of education at its mean:
+To compute the marginal effects of `closing` at its mean and each of the
+unique values of `neweduc`, we create a new dataset with the `age` and
+`closing` set to their means and `south` and `gov` set to their modes.
 
     use temp,clear
-    qui sum closing
+    qui sum neweduc
     loc mn=r(min)
     loc mx=r(max)
 
-    collapse (mean) age closing neweduc (median) south gov
+    collapse (mean) age closing (median) south gov
     expand 21
-    replace closing=`mn' + (_n-1)*(`mx'-`mn')/20
+    gen neweduc=`mn' + (_n-1)*(`mx'-`mn')/20
     gen educ2=neweduc^2
     gen cloeduc=closing*neweduc
     gen cloeduc2=closing*educ2
     gen age2=age^2
 
     putmata X=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
+
+Applying the first-differences method requires adding an increment to
+the main variable of interest. We add an increment of 1 (1 day) to
+`closing` and push the resulting dataset to Mata:
+
     preserve
-    replace neweduc = neweduc+1
-    replace educ2 = neweduc^2
+    replace closing = closing+1
     replace cloeduc = closing*neweduc
-    replace cloeduc2=closing*neweduc^2
+    replace cloeduc2 = closing*educ2
     putmata X1=(closing neweduc educ2 cloeduc cloeduc2 age age2 south gov 1), replace
     restore
     mata: mem=me_byrow(coef, X, X1)
 
-Push the DAME and MEM estimates from Mata into Stata’s active dataset
+Copy the DAME and MEM estimates from Mata into Stata’s active dataset
 and produce a plot:
 
     getmata (mem lbm ubm)=mem
     getmata (midpoint obs dame_est lb ub)=dame, force
 
-    twoway (line mem closing, lpattern(solid)) ///
-    (rline lbm ubm closing, lpattern(dash)) ///
+    twoway (line mem neweduc, lpattern(solid)) ///
+    (rline lbm ubm neweduc, lpattern(dash)) ///
     (rspike lb ub midpoint) ///
     (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
-    yline(0, lcolor(red)) ytitle("DAME/MEM of Education") xtitle("Closing Date") legend(off)
+    yline(0, lcolor(red)) ytitle("DAME/MEM of Closing date") xtitle("Education") legend(off)
 
-![](doc-files/Stata-fig/n-edu-dame.svg)
+![](doc-files/Stata-fig/n-clo-dame.svg)
 
-# News media and party discipline (dataset AJLW)
+# News media and party discipline (AJLW)
 
 Arceneaux et al. (2016) view Congressmen as facing a choice between
 voting with the party and more closely following the preferences of
-their constituencies. In this theory, politicians are expected to vote
-with their party when they can afford to do so when the next election is
-sufficiently far, their district is safe, or they can shape the public
-opinion in their districts. The article presents several hypotheses
-about the interactive effects of these factors; in the interest of
-space, we focus here only on the interaction between competitiveness and
-the proximity of elections.
+their constituencies. Politicians are expected to vote with their party
+when they can afford to do so when the next election is sufficiently
+far, their district is safe, or they can shape the public opinion in
+their districts. The article presents several hypotheses about the
+interactive effects of these factors, but in the interest of space, we
+focus here only on the interaction between competitiveness and the
+proximity of elections.
 
 ### Load the data and estimate the model
 
@@ -649,7 +679,7 @@ share in the preceding election in the representative’s district (the
 larger this share, the more competitive the district).
 
     clear all
-    use AJLW.dta,clear
+    use FoxNews_Master.dta,clear
     gen dvprop=dv/100
     gen daysdv=daystoelection*dvprop
     gen days2dv=daystoelection2*dvprop
@@ -686,10 +716,10 @@ larger this share, the more competitive the district).
        PartyVote | Coefficient  std. err.      z    P>|z|     [95% conf. interval]
     -------------+----------------------------------------------------------------
     daystoelec~n |  -.0053586    .006298    -0.85   0.395    -.0177025    .0069852
-    daystoelec~2 |   .0000158   .0000199     0.79   0.430    -.0000233    .0000548
+    daystoelec~2 |   .0000157   .0000199     0.79   0.430    -.0000233    .0000548
     daystoelec~3 |  -1.50e-08   1.92e-08    -0.78   0.435    -5.27e-08    2.27e-08
-          dvprop |   .9985836   2.279037     0.44   0.661    -3.468247    5.465414
-          daysdv |   .0110505    .018106     0.61   0.542    -.0244366    .0465377
+          dvprop |    .998589   2.279036     0.44   0.661    -3.468239    5.465417
+          daysdv |   .0110505    .018106     0.61   0.542    -.0244367    .0465376
          days2dv |  -.0000448   .0000578    -0.77   0.439     -.000158    .0000685
          days3dv |   5.76e-08   5.64e-08     1.02   0.307    -5.30e-08    1.68e-07
       Retirement |    1.01544   .1738517     5.84   0.000     .6746974    1.356184
@@ -704,13 +734,13 @@ larger this share, the more competitive the district).
        OtherPass |  -.9420381   .1077914    -8.74   0.000    -1.153305   -.7307708
            Amend |   -2.20396   .0958879   -22.98   0.000    -2.391897   -2.016023
          ProPart |  -.2191304   .0979501    -2.24   0.025    -.4111091   -.0271516
-           _cons |   -.073744   1.197516    -0.06   0.951    -2.420833    2.273345
+           _cons |  -.0737458   1.197516    -0.06   0.951    -2.420834    2.273343
     ------------------------------------------------------------------------------
 
 As earlier, we need to trim the dataset in Stata’s memory to keep only
-the used observations and save it as a new data file. We also need to
-simulate the distribution of coefficients and push it to Stata’s matrix
-environment Mata:
+the observations in the estimation sample and save it as a new data
+file. We also need to simulate the distribution of coefficients and push
+it to Stata’s matrix environment Mata:
 
     keep if e(sample)
     save temp, replace
@@ -723,7 +753,8 @@ environment Mata:
 To make the calculations, we need to define three Mata functions:
 
     mata
-    /* me() computes the difference in predictions computed with covariate matrices X and X_new*/
+    /* me() finds the difference in predicted values of the dependent variable
+        computed with covariate matrices x and x_new*/
     real matrix me(coef, x, x_new) {
     dydx=logistic(coef*x_new') - logistic(coef*x')
       /* Replace logistic() with the appropriate link function as needed */
@@ -733,7 +764,8 @@ To make the calculations, we need to define three Mata functions:
     real matrix me_byrow(coef, X, Z) {
     dydx=me(coef, X, Z)
     means=mean(dydx)'
-    ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'/* Confidence level can be changed here */
+    ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'
+    /* Confidence level can be changed here */
     return((means,ra))
     } 
     /* me_wt() returns a vector of weighted average marginal effects; this function uses me() internally */
@@ -760,15 +792,16 @@ a matrix of the covariate values with the increment added to the main
 variable of interest (for which we are computing the marginal effects),
 and the matrix of coefficients.
 
-### Plotting marginal effects
+### Plotting marginal effects of election proximity
 
 Replace `seniorit`, `spendgap_lag`, `spendgap`, and `distpart_lag` with
 their means, and `qualchal`, `qualchal_lag`, and `Retirement` with their
-modes, and make sure that the vote type variables single out the modal
-type of the vote (in this case, this means `Amend=1` and all other dummy
-variables representing this type set to zero). We then collapse the
-dataset and push it to Mata.
+modes, and make sure that the dummy variables representing the vote type
+correctly single out the modal type of the vote (in this case, this
+means that `Amend=1` and all other dummy variables representing this
+type are set to zero). We then collapse the dataset and push it to Mata.
 
+    use temp, clear
     foreach x of varlist qualchal qualchal_lag Retirement {
     qui sum `x'
     replace `x'= (r(mean)>0.5)
@@ -806,10 +839,10 @@ dataset and push it to Mata.
         days2dv days3dv Retirement seniorit qualchal_lag qualchal spendgap_lag spendgap ///
         distpart_lag RegPass Susp OtherPass Amend ProPart 1), replace
 
-To apply the first differencing method to computing the marginal effect
-of the number of days to the next election, add the increment of 1 to
-`neweduc`. We then push the new dataset to Mata and apply the
-`me_byrow()` function.
+To apply the first-differencing method to computing the marginal effect
+of the number of days to the next election, we add the increment of 1 (1
+day) to `daystoelection`. We then push the new dataset to Mata and apply
+the `me_byrow()` function.
 
     preserve 
     replace daystoelection = daystoelection+1
@@ -829,7 +862,9 @@ of the number of days to the next election, add the increment of 1 to
     gen significant=(lb>0 & ub>0)|(lb<0 & ub<0)
 
 Now, create a contourplot. We might want to add extra observations to
-anchor the scatter sizes.
+anchor the sizes of filled and hollow markers to a common scale. It is
+advisable to specify the color ramp in a way that more intense colors
+represent negative and positive values of higher magnitude.
 
     gen counter=_n
     qui sum counter
@@ -855,7 +890,7 @@ anchor the scatter sizes.
     loc maxest =`r(max)'
 
     loc colr= "navy*.5 ltblue*.5 white*.5 orange*.5 red*.5"
-    /* color ramp: have intense colors at both ends */
+    /* color ramp: intense colors at both ends */
 
     twoway (contour me_est daystoelection dvprop if me_est!=., ///
            ccuts(`locut' `lmedcut' `hmedcut' `hicut') ccolors(`colr')) ///
@@ -870,11 +905,12 @@ anchor the scatter sizes.
 
 ![](doc-files/Stata-fig/ajlw-cp.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of election proximity
 
 To compute the distribution-weighted average marginal effects, we first
 need to break the dataset into bins according to the values of the
-conditioning variable:
+conditioning variable (the Democratic vote share, `dvprop`). Here, we
+use deciles:
 
     use temp,clear
     xtile group_id = dvprop, nq(10)
@@ -889,15 +925,18 @@ conditioning variable:
     gen days2dv=daystoelection2*dvprop
     gen days3dv=daystoelection3*dvprop
 
-Now we push this information into Mata and apply the `me_wt()` functio:
+Now we push this information to Mata:
 
-    putmata wt=wt group_id=midpoint X=(daystoelection daystoelection2 daystoelection3 ///
+    putmata wt=wt ///
+      group_id=midpoint ///
+      X=(daystoelection daystoelection2 daystoelection3 ///
               dvprop daysdv days2dv days3dv Retirement seniorit qualchal_lag qualchal spendgap_lag ///
               spendgap distpart_lag RegPass Susp OtherPass Amend ProPart 1), replace
 
 As before, with the first differences method, we need to add an
 increment to the main explanatory variable (`daystoelection`), push this
-dataset to Mata, and apply the appropriate function.
+dataset to Mata. We apply the `me_wt()` function to find DAME with
+confidence intervals.
 
     preserve 
     replace daystoelection = daystoelection+1
@@ -914,7 +953,8 @@ dataset to Mata, and apply the appropriate function.
     mata: dame=me_wt(coef, X, X1, group_id, wt)
 
 Compute the marginal effect of the proximity of the next election at its
-mean:
+mean, 21 equally-spaced values of the Democratic vote share, and the
+means or modes of all other covariates:
 
     use temp,clear
     qui sum dvprop
@@ -923,12 +963,12 @@ mean:
     local dummies Amend OtherPass ProPart RegPass Susp
     egen baseline = rowmax(`dummies')
     replace baseline = 1-baseline
-    tabstat `dummies' baseline [fw=wt], save
+    tabstat `dummies' baseline, save
     mata props = st_matrix("r(StatTotal)")
     mata st_local("modal", st_matrixcolstripe("r(StatTotal)")[selectindex(props :== max(props))[1,1],2])
 
     collapse (mean) qualchal qualchal_lag Retirement daystoelection seniorit ///
-          (median) spendgap_lag spendgap distpart_lag [fw=wt]
+          (median) spendgap_lag spendgap distpart_lag
     foreach v in `dummies' {
         gen `v'=0
     }
@@ -959,8 +999,8 @@ mean:
      
     mata: mem=me_byrow(coef, X, X1)
 
-Push DAME and MEM estimates from Mata into Stata memory and produce a
-plot:
+Push DAME and MEM estimates from Mata into Stata’s active dataset and
+produce a plot:
 
     getmata (mem lbm ubm)=mem
     getmata (midpoint obs dame_est lb ub)=dame, force
@@ -972,11 +1012,10 @@ plot:
        (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
        yline(0, lcolor(red)) ytitle("DAME/MEM of Days to Election") ///
        xtitle("Democratic Vote Share") legend(off)
-    graph export ajlw-dame.svg,replace
 
 ![](doc-files/Stata-fig/ajlw-dame.svg)
 
-# Foreign direct investment and labor protest (dataset RT)
+# Foreign direct investment and labor protest (RT)
 
 Robertson and Teitelbaum (2011) study the response of the local labor to
 foreign direct investment. The article argues that FDI flows lead to
@@ -988,12 +1027,12 @@ fewer democratic means for resolving such conflicts.
 Since the dependent variable is a count of protests, we use a negative
 binomial regression (with random effects, as in the original study). The
 right-hand side of the model equation includes an interaction of
-political regime (Polity 2 score) and the natural log of FDI flows: we
-expect the latter’s effect to be conditional on the values of the
-former.
+political regime (Polity 2 score) and the natural log of FDI flows: the
+latter’s effect is expected to be conditional on the values of the
+former. Both variables are lagged.
 
     clear all
-    use RT.dta,clear
+    use "Robertson Teitelbaum 2011.dta",clear
 
     tsset country year 
     gen l_l_flows=L.l_flows
@@ -1097,10 +1136,10 @@ former.
     ------------------------------------------------------------------------------
     LR test vs. pooled: chibar2(01) = 125.73               Prob >= chibar2 = 0.000
 
-As earlier, we need to trim the dataset in memory to keep only the used
-observations and save it as a new data file. We also need to simulate
-the distribution of coefficients and push it to Stata’s matrix
-environment Mata:
+As earlier, we need to trim the dataset in memory to keep only the
+observations in the estimation sample and save it as a new data file. We
+also need to simulate the distribution of coefficients and push it to
+Stata’s matrix environment Mata:
 
     keep if e(sample)
     save temp, replace
@@ -1113,9 +1152,11 @@ environment Mata:
 To make the calculations, we need to define three Mata functions:
 
     mata
-    /* me() returns a vector of marginal effects for a given matrix */
+    /* me() here returns the partial derivatives of the predicted values of the dependent 
+        variable with for matrices with covariate values and coefficients  */
     real matrix me(coef, X, Z) {
-    int_coef_names = ("l_l_flows","l_demflows")     /* The coefficients used to compute the derivative of the linear component */
+    int_coef_names = ("l_l_flows","l_demflows")
+      /* The coefficients used to compute the derivative of the linear component */
     nam=st_matrixcolstripe("beta")
     k=J(cols(int_coef_names),1,.)
     for (j=1; j<=cols(int_coef_names); j++) {
@@ -1154,7 +1195,7 @@ The above-defined function `me()` will calculate the partial derivatives
 of the model prediction with respect to `l_l_flows` using the supplied
 matrix of the covariate values and the matrix of coefficients.
 
-### Plotting marginal effects
+### Plotting marginal effects of logged FDI flows
 
 Replace the values of the covariates (except the constitutive terms)
 with their means and compute the marginal effect of logged FDI flows
@@ -1162,7 +1203,7 @@ with their means and compute the marginal effect of logged FDI flows
 avoid overplotting later on.
 
     use temp,clear
-    foreach y of global varlist {
+    foreach y of varlist l_dispute open_penn l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop time {
     qui sum `y'
     replace `y'=r(mean)
     }
@@ -1227,22 +1268,22 @@ the marker sizes on the scatter plot.
      
     twoway histogram l_polity2 [fw=obs], frac ysca(alt reverse) ///
        xtitle("Polity score", size(medsmall)) ytitle("") ///
-       xlab(`x2min'(`s2')`x2max') ylab(#3) ///
+       xlab(`x2min'(`s2')`x2max') ylab(#4, nogrid labsize(medsmall)) ///
        fysize(20) fcolor(black%95) lwidth(vthin) lcolor(white%25) nodraw name(hy, replace) 
 
     twoway histogram l_l_flows  [fw=obs], frac xsca(alt reverse) ///
        horiz ytitle("ln(FDI flows)", size(medsmall)) xtitle("") ///
-       ylab(`x1min'(`s1')`x1max') xlab(#3) ///
+       ylab(`x1min'(`s1')`x1max') xlab(#4, nogrid labsize(medsmall))///
        fxsize(20) fcolor(black%95) lwidth(vthin) lcolor(white%25) nodraw name(hx, replace)
 
     gr combine hx yx hy, hole(3) imargin(zero) scale(1.1) xsize(5.5) ysize(5.5)
 
 ![](doc-files/Stata-fig/rt-hm.png)
 
-### Computing and plotting DAME
+### Computing and plotting DAME of the logged FDI flows:
 
 To compute the distribution-weighted average marginal effects, we first
-need to break the dataset into 4 bins according to the values of the
+need to break the dataset into 4 bins based on the values of the
 conditioning variable:
 
     use temp,clear
@@ -1250,7 +1291,7 @@ conditioning variable:
     xtile group_id = l_polity2, nq(4)
     egen midpoint=median(l_polity2),by(group_id)
 
-Now we push this information into Mata and apply the `me_wt()` function:
+Now we push this information to Mata and apply the `me_wt()` function:
 
     putmata wt=wt group_id=midpoint X=(l_l_flows l_polity2 l_demflows l_dispute open_penn ///
             l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop time 1) Z=(1 l_polity2) , replace
@@ -1263,7 +1304,7 @@ Compute the marginal effect of `l_l_flows` at its mean:
     loc mn=r(min)
     loc mx=r(max)
     collapse (mean) l_dispute open_penn l_gdp_pc_penn gdp_grth inflation_1 urban xratchg l_pop ///
-        time l_l_flows [fw=wt]
+        time l_l_flows
     expand 21
     gen l_polity2=`mn' + (_n-1)*(`mx'-`mn')/20
     gen l_demflows = l_l_flows*l_polity2
@@ -1282,7 +1323,7 @@ and make a plot:
     (rline lbm ubm l_polity2, lpattern(dash)) ///
     (rspike lb ub midpoint) ///
     (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
-    yline(0, lcolor(red)) ytitle("DAME/MEM of ln(FDI flows)") xtitle("Polity score") legend(off)
+    yline(0, lcolor(red)) ytitle("DAME/MEM of ln(FDI flows)") xtitle("Polity 2") legend(off)
 
 ![](doc-files/Stata-fig/rt-dame.svg)
 
@@ -1329,4 +1370,4 @@ Generation in r*. <https://yihui.org/knitr/>.
 Zhirnov, Andrei, Mert Moral, and Evgeny Sedashov. 2022. “Taking
 Distributions Seriously: On the Interpretation of the Estimates of
 Interactive Nonlinear Models.” *Political Analysis (Conditional
-Acceptance*.
+Acceptance)*.

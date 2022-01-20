@@ -1,22 +1,20 @@
 
-
-cd "C:/Users/az310/Dropbox/ME paper X/replication Stata vignette/data"
-
-*** building a plot with DAME and MEM for an analysis presented in
-*** Arceneaux, Kevin, Martin Johnson, Rene Lindstädt, and Ryan J. Vander Wielen. 2016. "The Influence of News Media on Political Elites: Investigating Strategic Responsiveness in Congress." _American Journal of Political Science_ 60(1): 5–29.
-*** The datasets is a part of the published replication materials and can be downloaded from
-*** https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27597" (FoxNews_Master.dta)
+*** A plot for the DAME and MEM estimates for the analysis presented in
+*** Arceneaux, Kevin, Martin Johnson, Rene Lindstädt, and Ryan J. Vander Wielen. 2016. "The Influence of News Media on Political Elites: Investigating Strategic Responsiveness in Congress." American Journal of Political Science 60(1): 5–29.
+*** The dataset is part of the published replication materials and can be downloaded from: https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/27597" (named "FoxNews_Master.dta")
 
 clear all
 
-* specify the function that returns a vector of marginal effects for a given matrix and a function
+* Specify the function that returns differences in the predicted values of the dependent variable for two matrices with the values of covariates (x and x_new).
+* If x_new includes an additional increment added to the main explanatory variable, it can be used in the first-difference method as well.
 mata
 real matrix me(coef, x, x_new) {
-dydx=logistic(coef*x_new') - logistic(coef*x')			/* Replace logistic() with the appropriate link function as needed */
+dydx=logistic(coef*x_new') - logistic(coef*x')							/* Replace logistic() with the appropriate link function as needed */
 return(dydx)
 }
 end
-* specify the function that returns a vector of marginal effects by row; this function uss me() internally
+
+* Specify the function that returns a vector of marginal effects by row; this function uses me() internally
 mata
 real matrix me_byrow(coef, X, Z) {
 dydx=me(coef, X, Z)
@@ -25,7 +23,8 @@ ra=mm_quantile(dydx, 1, (0.025 \ 0.975))'						        /* Confidence level can b
 return((means,ra))
 }
 end
-* specify the function that returns a vector of weighted average marginal effects; this function uss me() internally
+
+* Specify the function that returns a vector of weighted average marginal effects; this function uses me() internally
 mata
 real matrix me_wt(coef, X, Z, group_id, weight) {
 dydx=me(coef, X, Z)
@@ -44,8 +43,8 @@ return((groups,obs,means,ra))
 }
 end
 
-** load the data and estimate the model
-use AJLW.dta,clear
+* Load the data and estimate the model
+use "FoxNews_Master.dta",clear
 gen dvprop=dv/100
 gen daysdv=daystoelection*dvprop
 gen days2dv=daystoelection2*dvprop
@@ -57,12 +56,13 @@ matrix beta=e(b)[.,e(depvar) + ":"]
 matrix vcov=e(V)[e(depvar) + ":",e(depvar) + ":"]
 
 preserve
-* simulate coefficients
+
+* Simulate the coefficients
 drawnorm coef1-coef`=colsof(beta)', n(10000) means(beta) cov(vcov) clear
 putmata coef=(*), replace
 restore
 
-* produce the necessary datasets
+* Create the necessary datasets
 qui sum dvprop
 loc mn=r(min)
 loc mx=r(max)
@@ -89,8 +89,8 @@ restore
 
 mata: dame=me_wt(coef, X, X1, group_id, wt)
 
-* marginal effects at means
-** find the modal type of the vote
+** Marginal effects at means
+* Find the modal vote type. The user can also set Amend=1 and all other vote type dummies to 0.
 local dummies Amend OtherPass ProPart RegPass Susp
 egen baseline = rowmax(`dummies')
 replace baseline = 1-baseline
@@ -98,6 +98,7 @@ tabstat `dummies' baseline [fw=wt], save
 mata props = st_matrix("r(StatTotal)")
 mata st_local("modal", st_matrixcolstripe("r(StatTotal)")[selectindex(props :== max(props))[1,1],2])
 
+* Set all other variables to their means or modes
 collapse (mean) qualchal qualchal_lag Retirement daystoelection seniorit (median) spendgap_lag spendgap distpart_lag [fw=wt]
 foreach v in `dummies' {
 	gen `v'=0
@@ -127,9 +128,10 @@ mata: mem=me_byrow(coef, X, X1)
 getmata (mem lbm ubm)=mem
 getmata (midpoint obs dame_est lb ub)=dame, force
 
-* plot
+* Plot the DAME and MEM estimates
+/* Note that the replication do file uses additional graphical parameters, which leads to different axis and legend labels from this minimal example. */
 twoway (line mem dvprop, lpattern(solid)) ///
 (rline lbm ubm dvprop, lpattern(dash)) ///
 (rspike lb ub midpoint) ///
 (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
-yline(0, lcolor(red)) ytitle("ME of Days to Election") xtitle("Democratic Vote Share") legend(off)
+yline(0, lcolor(red)) ytitle("ME of Days to Election") xtitle("Democratic Vote Share") legend(off) ylab(-.0001(.00008).00022)
