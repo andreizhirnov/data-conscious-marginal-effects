@@ -100,7 +100,3 @@ twoway (contour me_est neweduc closing if me_est!=., ccuts(`locut' `medcut' `hic
 (scatter neweduc closing [fw=obs] if significant==1, msymbol(o) mfcolor(black%95) mlwidth(none) msize(*.25)), ///
 xtitle(Closing Date) ytitle(Education) ztitle("") zlabel(`minest' `locut' `medcut' `hicut' `maxest') ///
 legend(off)  clegend(title(`"Effect Size"', size(medsmall) pos(12) justification(right)) width(5) height(25))
-local tn="n-edu-cp"
-graph export `tn'.png
-graph export `tn'.svg
-graph export `tn'.pdf

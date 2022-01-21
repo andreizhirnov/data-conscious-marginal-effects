@@ -113,7 +113,3 @@ twoway (line mem closing, lpattern(solid)) ///
 (rspike lb ub midpoint) ///
 (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
 yline(0, lcolor(red)) ytitle("ME of Education") xtitle("Closing Date") legend(off)
-local tn="n-edu-dame"
-graph export `tn'.png
-graph export `tn'.svg
-graph export `tn'.pdf

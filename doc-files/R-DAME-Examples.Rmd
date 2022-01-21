@@ -1,5 +1,5 @@
 ---
-title: " Plotting marginal effects and computing DAME with R: examples "
+title: " Plotting marginal effects and computing DAME with R: Examples "
 subtitle: 'Supplement to: Zhirnov, Andrei, Mert Moral, and Evgeny Sedashov. 2022. "Taking Distributions Seriously: On the Interpretation of the Estimates of Interactive Nonlinear Models." Political Analysis (Conditional Acceptance)'
 mainfont: Times New Roman
 bibliography: [refs.bib, packages.bib]
@@ -241,9 +241,9 @@ m <- glm(newvote ~ closing*neweduc + closing*I(neweduc^2) + age + I(age^2) + sou
 summary(m)
 ```
 
-### Plotting marginal effects of the registration closing date
+### Plotting marginal effects of registration closing date
 
-We can use the `plot_me()` function to draw a contour-plot for the marginal effects of the registration closing date. Since `closing` can only take on integer values, it makes more sense here to use the first-difference method for calculating the marginal effect. Thus, we set `discrete=TRUE` and use 1-day increments. 
+We can use the `plot_me()` function to draw a contour-plot for the marginal effects of registration closing date. Since `closing` can only take on integer values, it makes more sense here to use the first-difference method for calculating the marginal effect. Thus, we set `discrete=TRUE` and use 1-day increments. 
 ```{r n-cp} 
 plot_me(model = m, x = "closing", over = "neweduc", discrete = TRUE, discrete_step = 1) +
   scale_fill_steps(low="red", high="yellow", n.breaks=4) +
@@ -284,7 +284,7 @@ plot_me(model = m, x ="neweduc" , over = "closing", discrete = TRUE, discrete_st
   coord_flip()
 ```
 
-### Computing and plotting DAME of the registration closing date
+### Computing and plotting DAME of registration closing date
 
 Turning to DAME, we can use a similar syntax as before and, since `neweduc` takes only 8 unique values, we can bin the observations by the unique values of this variable (`use_distinct_values=TRUE`).
 ```{r n-dame}
@@ -326,7 +326,7 @@ ggplot(data=d, aes(x=bin_id, y=est, ymin=lb, ymax=ub)) +
 
 # News media and party discipline (AJLW)
 
-@Arceneaux2016 view Congressmen as facing a choice between voting with the party and more closely following the preferences of their constituencies. In this theory, politicians are expected to vote with their party when they can afford to do so when the next election is sufficiently far, their district is safe, or they can shape the public opinion in their districts. The article presents several hypotheses about the interactive effects of these factors; in the interest of space, we focus here only on the interaction between the competitiveness and the proximity of elections.
+@Arceneaux2016 view Congressmen as facing a choice between voting with the party and more closely following the preferences of their constituencies. In this theory, politicians are expected to vote with their party when they can afford to do so when the next election is sufficiently far, their district is safe, or they can shape the public opinion in their districts. The article presents several hypotheses about the interactive effects of these factors; in the interest of space, we focus here only on the interaction between competitiveness and the proximity of the next election.
 
 ### Load the data and estimate the model
 To examine the interactive effect of district competitiveness and the proximity of the next election, following @Arceneaux2016, we subset the data and examine the Republicans from the districts in which Fox News was present (this is another explanatory variable in the authors' study) and build a model explaining whether a Congressman voted with their party and including a full interaction term of the polynomial of the number of days until the next election and the Democratic vote share in the preceding election in the representative's district (the larger this share, the more competitive the district).
@@ -418,7 +418,7 @@ ggplot(data=d, aes(x=bin_id, y=est, ymin=lb, ymax=ub)) +
 @Robertson2011 study the response of the local labor to foreign direct investment. The article argues that FDI flows lead to more labor protests, and this effect is more substantial when there are fewer democratic means for resolving such conflicts.
 
 ### Load the data and estimate the model
-Since the dependent variable is a count of protests, we use a negative binomial regression. The right-hand side of the model equation includes an interaction of political regime (Polity 2 score) and the natural log of FDI flow: we expect the latter's effect to be conditional on the values of the former.
+Since the dependent variable is a count of protests, we use a negative binomial regression. The right-hand side of the model equation includes an interaction of political regime (Polity 2 score) and the natural log of FDI flow. We expect the latter's effect to be conditional on the values of the former.
 ```{r rt-est} 
 dt <- readRDS("RT.rds")
 current_vals <- dt[,c("isocode","year","dispute","open_penn","l_gdp_pc_penn","gdp_grth",

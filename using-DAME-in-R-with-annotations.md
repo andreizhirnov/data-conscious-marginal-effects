@@ -391,11 +391,11 @@ term of `closing` and `neweduc` squared.
     ## 
     ## Number of Fisher Scoring iterations: 4
 
-### Plotting marginal effects of the registration closing date
+### Plotting marginal effects of registration closing date
 
 We can use the `plot_me()` function to draw a contour-plot for the
-marginal effects of the registration closing date. Since `closing` can
-only take on integer values, it makes more sense here to use the
+marginal effects of registration closing date. Since `closing` can only
+take on integer values, it makes more sense here to use the
 first-difference method for calculating the marginal effect. Thus, we
 set `discrete=TRUE` and use 1-day increments.
 
@@ -454,7 +454,7 @@ keeping the same orientation of axes as before. To do so, we can use the
 
 ![](doc-files/R-fig/n-cp2-1.png)
 
-### Computing and plotting DAME of the registration closing date
+### Computing and plotting DAME of registration closing date
 
 Turning to DAME, we can use a similar syntax as before and, since
 `neweduc` takes only 8 unique values, we can bin the observations by the
@@ -508,8 +508,8 @@ with their party when they can afford to do so when the next election is
 sufficiently far, their district is safe, or they can shape the public
 opinion in their districts. The article presents several hypotheses
 about the interactive effects of these factors; in the interest of
-space, we focus here only on the interaction between the competitiveness
-and the proximity of elections.
+space, we focus here only on the interaction between competitiveness and
+the proximity of the next election.
 
 ### Load the data and estimate the model
 
@@ -676,7 +676,7 @@ fewer democratic means for resolving such conflicts.
 Since the dependent variable is a count of protests, we use a negative
 binomial regression. The right-hand side of the model equation includes
 an interaction of political regime (Polity 2 score) and the natural log
-of FDI flow: we expect the latter’s effect to be conditional on the
+of FDI flow. We expect the latter’s effect to be conditional on the
 values of the former.
 
     dt <- readRDS("RT.rds")
