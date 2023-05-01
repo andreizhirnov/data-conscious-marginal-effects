@@ -845,11 +845,11 @@ fewer democratic means for resolving such conflicts.
 ### Load the data and estimate the model
 
 Since the dependent variable is a count of protests, we use a negative
-binomial regression (with random effects, as in the original study). The
-right-hand side of the model equation includes an interaction of
-political regime (Polity 2 score) and the natural log of FDI flows: the
-latter’s effect is expected to be conditional on the values of the
-former. Both variables are lagged.
+binomial regression. Because Stata (with random effects, as in the
+original study). The right-hand side of the model equation includes an
+interaction of political regime (Polity 2 score) and the natural log of
+FDI flows: the latter’s effect is expected to be conditional on the
+values of the former. Both variables are lagged.
 
     clear all
     use "Robertson Teitelbaum 2011.dta",clear
@@ -860,8 +860,8 @@ former. Both variables are lagged.
     gen l_dispute=L.dispute
     gen l_demflows=l_l_flows*l_polity2
      
-    xtnbreg dispute c.l_l_flows##c.l_polity2 l_dispute open_penn l_gdp_pc_penn gdp_grth ///
-      inflation_1 urban xratchg l_pop time, re
+    nbreg dispute c.l_l_flows##c.l_polity2 l_dispute open_penn l_gdp_pc_penn gdp_grth ///
+      inflation_1 urban xratchg l_pop time
     keep if e(sample)
 
     Panel variable: country (strongly balanced)
@@ -877,7 +877,7 @@ former. Both variables are lagged.
     (1,074 missing values generated)
 
 
-    Fitting negative binomial (constant dispersion) model:
+    Fitting Poisson model:
 
     Iteration 0:   log likelihood = -19743.067  (not concave)
     Iteration 1:   log likelihood = -19693.709  (not concave)
@@ -898,67 +898,55 @@ former. Both variables are lagged.
     Iteration 16:  log likelihood = -994.26733  
     Iteration 17:  log likelihood = -994.26733  
 
-    Iteration 0:   log likelihood = -1138.5175  
-    Iteration 1:   log likelihood = -1048.9393  
-    Iteration 2:   log likelihood = -1043.1845  
+    Fitting constant-only model:
+
+    Iteration 0:   log likelihood = -1388.1254  (not concave)
+    Iteration 1:   log likelihood = -1052.3141  
+    Iteration 2:   log likelihood = -1043.1756  
     Iteration 3:   log likelihood = -1043.1752  
     Iteration 4:   log likelihood = -1043.1752  
 
-    Iteration 0:   log likelihood = -1043.1752  (not concave)
-    Iteration 1:   log likelihood = -974.09467  
-    Iteration 2:   log likelihood = -939.21383  (not concave)
-    Iteration 3:   log likelihood = -819.68488  
-    Iteration 4:   log likelihood =  -786.2915  
-    Iteration 5:   log likelihood = -781.86279  
-    Iteration 6:   log likelihood = -781.78374  
-    Iteration 7:   log likelihood =  -781.7837  
-
     Fitting full model:
 
-    Iteration 0:   log likelihood = -768.40601  
-    Iteration 1:   log likelihood = -724.05204  
-    Iteration 2:   log likelihood = -718.95793  
-    Iteration 3:   log likelihood = -718.92085  
-    Iteration 4:   log likelihood = -718.92082  
+    Iteration 0:   log likelihood = -987.94406  (not concave)
+    Iteration 1:   log likelihood = -857.95872  
+    Iteration 2:   log likelihood = -826.58029  
+    Iteration 3:   log likelihood = -798.29417  
+    Iteration 4:   log likelihood =  -789.9797  
+    Iteration 5:   log likelihood = -789.58114  
+    Iteration 6:   log likelihood = -789.57898  
+    Iteration 7:   log likelihood = -789.57898  
 
-    Random-effects negative binomial regression          Number of obs    =  2,348
-    Group variable: country                              Number of groups =    131
-
-    Random effects u_i ~ Beta                            Obs per group:
-                                                                      min =      1
-                                                                      avg =   17.9
-                                                                      max =     25
-
-                                                         Wald chi2(12)    = 162.80
-    Log likelihood = -718.92082                          Prob > chi2      = 0.0000
+    Negative binomial regression                            Number of obs =  2,348
+                                                            LR chi2(12)   = 507.19
+    Dispersion: mean                                        Prob > chi2   = 0.0000
+    Log likelihood = -789.57898                             Pseudo R2     = 0.2431
 
     ------------------------------------------------------------------------------
          dispute | Coefficient  Std. err.      z    P>|z|     [95% conf. interval]
     -------------+----------------------------------------------------------------
-       l_l_flows |   .3956329   .0843602     4.69   0.000       .23029    .5609758
-       l_polity2 |   .2741761   .0597606     4.59   0.000     .1570476    .3913047
+       l_l_flows |   .1508375   .0630615     2.39   0.017     .0272392    .2744358
+       l_polity2 |   .1871974   .0419696     4.46   0.000     .1049386    .2694563
                  |
      c.l_l_flows#|
-     c.l_polity2 |  -.0323768   .0087734    -3.69   0.000    -.0495724   -.0151813
+     c.l_polity2 |  -.0194819   .0064384    -3.03   0.002     -.032101   -.0068629
                  |
-       l_dispute |   .0594588   .0192369     3.09   0.002     .0217551    .0971625
-       open_penn |   .0007637   .0036998     0.21   0.836    -.0064878    .0080152
-    l_gdp_pc_p~n |  -.1925234   .2337453    -0.82   0.410    -.6506558    .2656089
-        gdp_grth |   -.028622   .0155615    -1.84   0.066    -.0591221     .001878
-     inflation_1 |   .0001256   .0000684     1.84   0.066    -8.48e-06    .0002597
-           urban |   .0219114   .0092731     2.36   0.018     .0037364    .0400863
-         xratchg |   .0031663   .0038741     0.82   0.414    -.0044268    .0107595
-           l_pop |   .3889047    .113996     3.41   0.001     .1654766    .6123328
-            time |   .0322821   .0163049     1.98   0.048      .000325    .0642392
-           _cons |  -10.22589   2.576873    -3.97   0.000    -15.27647   -5.175317
+       l_dispute |   .3391093     .05058     6.70   0.000     .2399744    .4382442
+       open_penn |  -.0005637   .0020886    -0.27   0.787    -.0046572    .0035298
+    l_gdp_pc_p~n |   .2981196   .1761671     1.69   0.091    -.0471616    .6434008
+        gdp_grth |  -.0004039   .0181047    -0.02   0.982    -.0358885    .0350807
+     inflation_1 |   .0000981   .0000848     1.16   0.247    -.0000681    .0002644
+           urban |   .0226707   .0063548     3.57   0.000     .0102155    .0351259
+         xratchg |  -.0007718   .0046886    -0.16   0.869    -.0099613    .0084176
+           l_pop |   .6341396   .0793996     7.99   0.000     .4785192      .78976
+            time |   -.011712   .0147303    -0.80   0.427     -.040583    .0171589
+           _cons |  -17.23651   1.921069    -8.97   0.000    -21.00174   -13.47129
     -------------+----------------------------------------------------------------
-           /ln_r |    1.07164   .2607792                      .5605223    1.582758
-           /ln_s |  -.2429911   .3254917                     -.8809432    .3949609
+        /lnalpha |   .9170054    .140736                      .6411678    1.192843
     -------------+----------------------------------------------------------------
-               r |   2.920165   .7615182                      1.751587    4.868364
-               s |   .7842785   .2552761                      .4143919    1.484326
+           alpha |   2.501787   .3520916                      1.898697    3.296439
     ------------------------------------------------------------------------------
-    LR test vs. pooled: chibar2(01) = 125.73               Prob >= chibar2 = 0.000
+    LR test of alpha=0: chibar2(01) = 409.38               Prob >= chibar2 = 0.000
 
     (1,516 observations deleted)
 
@@ -970,14 +958,18 @@ observations in the estimation sample and save it as a new data file.
 
 ### Plotting marginal effects of logged FDI flows
 
-Compute values for the background:
+First, we calculate marginal effects for the heatmap. By default, if
+called after `xtnbreg,re`, *margins* computes marginal effects on the
+linear prediction; to compute marginal effects on the incidence rate, we
+need include `predict(ir0)` option. This specification ignores random
+effects.
 
     foreach v of varlist l_l_flows l_polity2 {
         qui sum `v'
         local `v'_s "(`r(min)'(`=(r(max)-r(min))/15')`r(max)')"
     }
     margins, dydx(l_l_flows) at(l_l_flows=`l_l_flows_s' l_polity2=`l_polity2_s' (mean) _all) ///
-       saving(temp_bg,replace)
+     predict(iru0) saving(temp_bg,replace)
 
 We bin the values of logged flows to avoid overplotting later on.
 
@@ -987,7 +979,7 @@ We bin the values of logged flows to avoid overplotting later on.
     }
     egen group_id=group(l_l_flows_r l_polity2_r)
     margins, dydx(l_l_flows) over(group_id) at((omean) _all (mean) l_l_flows l_polity2) ///
-       saving(temp_me,replace)
+      predict(iru0) saving(temp_me,replace)
 
 Combine information:
 
@@ -1050,10 +1042,12 @@ the marker sizes on the scatter plot.
     xsca(alt) ysca(alt) xtitle("") ytitle("") ztitle("") ///
     ylab(`l_l_flows_r', grid gmax labsize(medsmall)) ///
     xlab(`l_polity2_r', labsize(medsmall) grid gmax) /// 
-    clegend(title("Effect Size", size(medsmall) pos(12) justification(right)) ring(0) width(5) height(25)) ///
+    clegend(title("Effect Size", size(medsmall) pos(12) justification(right)) ring(0) ///
+       width(5) height(25)) ///
     legend(off) nodraw name(yx, replace)
 
-    twoway histogram l_polity2 [fw=obs], frac ysca(alt reverse) xtitle("Polity 2", size(medsmall)) ytitle("") ///
+    twoway histogram l_polity2 [fw=obs], frac ysca(alt reverse) ///
+    xtitle("Polity 2", size(medsmall)) ytitle("") ///
     xlab(`l_polity2_r') ylab(#4, nogrid labsize(medsmall)) ///
     fysize(20) fcolor(black%95) lwidth(vthin) lcolor(white%25) nodraw name(hy, replace) 
 
@@ -1074,13 +1068,13 @@ conditioning variable:
 
     use temp,clear
     xtile group_id = l_polity2, nq(4)
-    margins, dydx(l_l_flows) over(group_id) saving(temp_dame, replace) 
+    margins, dydx(l_l_flows) over(group_id) predict(iru0) saving(temp_dame, replace) 
 
 Compute the marginal effect of `l_l_flows` at its mean:
 
     qui sum l_polity2
     loc cuts="`=r(min)'(1)`=r(max)'"
-    margins, dydx(l_l_flows) at(l_polity2=(`cuts')) atmeans saving(temp_mem, replace)
+    margins, dydx(l_l_flows) at(l_polity2=(`cuts')) atmeans predict(iru0) saving(temp_mem, replace)
 
 Combine information:
 

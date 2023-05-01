@@ -22,7 +22,7 @@ foreach v of varlist l_l_flows l_polity2 {
 	qui sum `v'
 	local `v'_s "(`r(min)'(`=(r(max)-r(min))/15')`r(max)')"
 }
-margins, dydx(l_l_flows) at(l_l_flows=`l_l_flows_s' l_polity2=`l_polity2_s' (mean) _all) saving(temp_bg,replace)
+margins, dydx(l_l_flows) at(l_l_flows=`l_l_flows_s' l_polity2=`l_polity2_s' (mean) _all) predict(iru0) saving(temp_bg,replace)
 
 *** points for the foreground
 foreach v of varlist l_l_flows l_polity2 {
@@ -30,7 +30,7 @@ foreach v of varlist l_l_flows l_polity2 {
 	egen `v'_r = cut(`v'), at(`=r(min)-0.5'(`=(1+r(max)-r(min))/10')`=r(max)+0.5')
 }
 egen group_id=group(l_l_flows_r l_polity2_r)
-margins, dydx(l_l_flows) over(group_id) at((omean) _all (mean) l_l_flows l_polity2) saving(temp_me,replace)
+margins, dydx(l_l_flows) over(group_id) at((omean) _all (mean) l_l_flows l_polity2) predict(iru0) saving(temp_me,replace)
 
 collapse (count) obs=l_l_flows (mean) l_l_flows l_polity2, by(group_id)
 

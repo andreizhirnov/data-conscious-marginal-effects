@@ -19,11 +19,11 @@ keep if e(sample)
 
 ** DAME
 xtile group_id = l_polity2, nq(4)
-margins, dydx(l_l_flows) over(group_id) saving(temp_dame, replace) 
+margins, dydx(l_l_flows) over(group_id) predict(iru0) saving(temp_dame, replace) 
 ** marginal effects at means
 qui sum l_polity2
 loc cuts="`=r(min)'(1)`=r(max)'"
-margins, dydx(l_l_flows) at(l_polity2=(`cuts')) atmeans saving(temp_mem, replace)
+margins, dydx(l_l_flows) at(l_polity2=(`cuts')) predict(iru0) atmeans saving(temp_mem, replace)
 ** combine information
 collapse (median) l_polity2 (count) obs=l_polity2, by(group_id)
 rename group_id _by1
