@@ -3,7 +3,7 @@
 This document illustrates how to generate plots with
 distribution-weighted average marginal effects (DAME) and heatmaps and
 contour plots for the marginal effects in Stata. We use the same
-examples as Zhirnov, Moral, and Sedashov (2022), but simpler Stata code.
+examples as Zhirnov, Moral, and Sedashov (2023), but simpler Stata code.
 In addition to the standard Stata and Mata commands, you will need to
 install the `moremata` package (Jann 2005), which can be downloaded from
 `ssc`:
@@ -265,7 +265,7 @@ equal to that of the smallest marker of either type.
           legend(off)  clegend(title("Effect Size", ///
        size(medsmall) pos(12) justification(right)) width(5) height(25)) 
 
-![](doc-files/Stata-fig/g-cp.png)
+![](doc-files/Stata-fig-older/g-cp.png)
 
 To create a heatmap instead of a contour plot, we can use the `crule`
 option instead of `ccuts` in the `twoway contour` syntax:
@@ -326,7 +326,7 @@ option instead of `ccuts` in the `twoway contour` syntax:
 
     gr combine hx yx hy, hole(3) imargin(zero) scale(1.1) xsize(5.5) ysize(5.5)
 
-![](doc-files/Stata-fig/g-hm.png)
+![](doc-files/Stata-fig-older/g-hm.png)
 
 ### Computing and plotting DAME of polarization
 
@@ -386,7 +386,7 @@ make a plot:
     yline(0, lcolor(red)) ytitle("DAME/MEM of polarization") ///
       xtitle("Effective Electoral Threshold") legend(off)
 
-![](doc-files/Stata-fig/g-dame.svg)
+![](doc-files/Stata-fig-older/g-dame.svg)
 
 # Voter registration rules and turnout (N)
 
@@ -574,7 +574,7 @@ filled and hollow markers to the same largest and smallest values.
     legend(off)  clegend(title("Effect Size", size(medsmall) pos(12) ///
       justification(right)) width(5) height(25)) 
 
-![](doc-files/Stata-fig/n-clo-cp.png)
+![](doc-files/Stata-fig-older/n-clo-cp.png)
 
 ### Computing and plotting DAME of the restrictiveness of electoral registration rules
 
@@ -652,7 +652,7 @@ and produce a plot:
     (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
     yline(0, lcolor(red)) ytitle("DAME/MEM of Closing date") xtitle("Education") legend(off)
 
-![](doc-files/Stata-fig/n-clo-dame.svg)
+![](doc-files/Stata-fig-older/n-clo-dame.svg)
 
 # News media and party discipline (AJLW)
 
@@ -903,7 +903,7 @@ represent negative and positive values of higher magnitude.
        legend(off)  clegend(title("Effect Size", ///
          size(medsmall) pos(12) justification(right)) width(5) height(25)) 
 
-![](doc-files/Stata-fig/ajlw-cp.png)
+![](doc-files/Stata-fig-older/ajlw-cp.png)
 
 ### Computing and plotting DAME of election proximity
 
@@ -1013,7 +1013,7 @@ produce a plot:
        yline(0, lcolor(red)) ytitle("DAME/MEM of Days to Election") ///
        xtitle("Democratic Vote Share") legend(off)
 
-![](doc-files/Stata-fig/ajlw-dame.svg)
+![](doc-files/Stata-fig-older/ajlw-dame.svg)
 
 # Foreign direct investment and labor protest (RT)
 
@@ -1278,7 +1278,7 @@ the marker sizes on the scatter plot.
 
     gr combine hx yx hy, hole(3) imargin(zero) scale(1.1) xsize(5.5) ysize(5.5)
 
-![](doc-files/Stata-fig/rt-hm.png)
+![](doc-files/Stata-fig-older/rt-hm.png)
 
 ### Computing and plotting DAME of the logged FDI flows:
 
@@ -1325,7 +1325,7 @@ and make a plot:
     (scatter dame_est midpoint [fw=obs], msymbol(o) msize(*.25)), /// 
     yline(0, lcolor(red)) ytitle("DAME/MEM of ln(FDI flows)") xtitle("Polity 2") legend(off)
 
-![](doc-files/Stata-fig/rt-dame.svg)
+![](doc-files/Stata-fig-older/rt-dame.svg)
 
 # This document
 
